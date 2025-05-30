@@ -32,5 +32,5 @@ function tankbackground() {
       b.speed = random(0.5, 2);
     }
   }
-  image(img, width / 2, height / 2, width, height * 0.75);
+  image(img, width / 2, height / 2, width * .75, height * 0.75);
 }
