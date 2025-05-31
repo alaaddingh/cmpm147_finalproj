@@ -6,13 +6,12 @@ class Fish {
     this.finSize = traits.finSize;
     this.size = traits.size;
     this.color = traits.color;
-    this.aggression = traits.aggression; // Fixed spelling to match usage
+    this.aggression = traits.aggression;
     this.lifespan = traits.lifespan;  // How long without eating before death
     this.age = 0;
     this.energy = 100; // Used for breeding and lifespan
     this.alive = true;
-    this.isSaltwater = traits.isSaltwater; // Added missing property
-
+    this.isSaltwater = traits.isSaltwater;
     // motion properties
     this.setInitialMotion();
     this.swimOffset = random(TWO_PI);
@@ -34,6 +33,10 @@ class Fish {
 
   /**
    * Checks if fish is alive
+   * We can possibly remove age and use energy instead
+   * use lifespan as max energy
+   * when energy=0, fish dies
+   * maybe energy < 30%, fish moves slower?
    */
   isAlive() {
     if (this.age >= this.lifespan) {
@@ -103,6 +106,8 @@ class Fish {
     if (sizeRatio > 1.5 || (sizeRatio > 1.2 && aggressionFactor > 1.5)) {
       // Successfully eat the other fish
       this.energy += other.size * 5; // Gain energy based on prey size
+      other.alive = false; // Set as dead, updateFish.js will handle removal
+      console.log(this+" ate "+other);
       return true;
     }
     return false;
@@ -112,46 +117,32 @@ class Fish {
      *  Checks if this fish can breed with the other fish
      */
     breed(other) {
-      // Check if they can breed (same water type, sufficient energy)
+      // Check breeding compatibility
       if (this.isSaltwater !== other.isSaltwater || 
           this.energy < 50 || other.energy < 50 ||
-          this.age > this.lifespan * 0.8 || other.age > other.lifespan * 0.8) {
+          this.age > this.lifespan * 0.8 || other.age > other.lifespan * 0.8 || 
+          this.age < 50 || other.age < 50) {
         return null;
       }
       
-      // Combine genomes with some mutation
-      let newSpeed = (this.speed + other.speed) / 2 * random(0.9, 1.1);
-      let newSize = (this.size + other.size) / 2 * random(0.9, 1.1);
-      let newFinSize = (this.finSize + other.finSize) / 2 * random(0.9, 1.1);
-      
-      // Blend colors
-      let newColor = lerpColor(
-        color(this.color), 
-        color(other.color), 
-        random(0.3, 0.7)
-      );
-      
-      let newAggression = (this.aggression + other.aggression) / 2 * random(0.9, 1.1);
-      let newLifespan = (this.lifespan + other.lifespan) / 2 * random(0.9, 1.1);
-      
-      // Create offspring at midpoint between parents
-      let offspringX = (this.x + other.x) / 2;
-      let offspringY = (this.y + other.y) / 2;
-      
-      // Parents lose energy from breeding
-      this.energy -= 50;
-      other.energy -= 50;
-      let newFishTraits = {
-        speed: newSpeed,
-        size: newSize,
-        finSize: newFinSize,
-        color: newColor,
-        aggression: newAggression,
-        lifespan: newLifespan,
+      // Genetic recombination with mutation
+      let newTraits = {
+        speed: (this.speed + other.speed) / 2 * random(0.9, 1.1),
+        size: (this.size + other.size) / 2 * random(0.9, 1.1),
+        finSize: (this.finSize + other.finSize) / 2 * random(0.9, 1.1),
+        color: lerpColor(color(this.color), color(other.color), random(0.3, 0.7)),
+        aggression: (this.aggression + other.aggression) / 2 * random(0.9, 1.1),
+        lifespan: (this.lifespan + other.lifespan) / 2 * random(0.9, 1.1),
         isSaltwater: this.isSaltwater
-      }
+      };
       
-      return new Fish(offspringX, offspringY, newFishTraits);
+      console.log(self+" bred with "+other);
+      // Position offspring between parents
+      return new Fish(
+        (this.x + other.x) / 2,
+        (this.y + other.y) / 2,
+        newTraits
+      );
     }
 
   update(fishArray) {
@@ -159,7 +150,7 @@ class Fish {
       fishArray.splice(fishArray.indexOf(this), 1);
       return;
     }
-    // this.energy -= 1;
+    this.energy -= 0.1;
     // Collision Check
     let other = this.checkCollision(fishArray);
     if (other) {
@@ -179,6 +170,11 @@ class Fish {
   display() {
     fill(this.color);
     noStroke();
-    ellipse(this.x, this.y, this.size, this.size);
+    // Different shapes to identify salt or fresh (replace later)
+    if (this.isSaltwater == true) {
+      ellipse(this.x, this.y, this.size * 2, this.size * 2);
+    } else if (this.isSaltwater == false) {
+      rect(this.x, this.y, this.size, this.size);
+    }
   }
 }
