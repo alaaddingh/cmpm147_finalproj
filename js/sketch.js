@@ -29,9 +29,6 @@ function loadfish() {
 }
   for (let i = 0; i < fishData.length; i++) {
     let f = fishData[i];
-    console.log("fish instance:" + f);
-    let x = random(TANK.left() + f.size / 2, TANK.right() - f.size / 2);
-    let y = random(TANK.top() + f.size / 2, TANK.bottom() - f.size / 2);
     /**
      *   ternary operator for fish json to determine traits
      */
@@ -42,6 +39,8 @@ function loadfish() {
       color: color(f.color[0], f.color[1], f.color[2]),
       lifespan: f.lifespan === "long" ? random(5000, 10000) : f.lifespan === "short" ? random(2000, 4000) : random(3000, 6000)
     };
+    let x = random(TANK.left() + traits.size / 2, TANK.right() - traits.size / 2);
+    let y = random(TANK.top() + traits.size / 2, TANK.bottom() - traits.size / 2);
     fishArray.push(new Fish(x, y, traits));
   }
 }

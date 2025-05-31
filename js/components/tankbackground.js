@@ -1,3 +1,9 @@
+
+/**
+ * Purpose of this file: To create the tank background and bubble animation in transparent zone of
+ * backdrop.
+ * 
+ */
 let tankBubbles = null;
 
 function tankbackground() {

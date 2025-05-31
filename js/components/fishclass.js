@@ -10,22 +10,28 @@ class Fish {
     this.age = 0;
     this.alive = true;
 
-    // Motion parameters
+    // motion properties
     this.setInitialMotion();
-    // Sine wave wiggle parameters
     this.swimOffset = random(TWO_PI);
     this.swimAmplitude = random(1, 4);
     this.swimFrequency = random(0.05, 0.1);
   }
 
+
+  /**
+   * Sets the initial motion of the fish in a random direction, 
+   * biases left or right for more natural swimming behavior.
+   */
   setInitialMotion() {
-    // Bias velocity to be more horizontal (side-to-side)
     let angle = random(-PI / 4, PI / 4);
     if (random() < 0.5) angle += PI;
     this.vx = cos(angle) * this.speed;
     this.vy = sin(angle) * this.speed * 0.3;
   }
 
+  /**
+   * Checks if fish is alive
+   */
   isAlive() {
     if (this.age >= this.lifespan) {
       this.alive = false;
@@ -36,7 +42,8 @@ class Fish {
   }
 
   /**
-   * Checks if fish is within the tank. If not, change velocity to keep it within bounds.
+   * Checks if fish is within the tank. 
+   * If not, change velocity to keep it within bounds.
    */
   checkBounds() {
     let bounced = false;
@@ -50,10 +57,12 @@ class Fish {
       bounced = true;
       this.y = constrain(this.y, TANK.top() + this.size / 2, TANK.bottom() - this.size / 2);
     }
-    // Optionally randomize swim phase on bounce for more natural motion
     if (bounced) this.swimOffset = random(TWO_PI);
   }
 
+  /**
+   *  updates motion per frame
+   */
   move() {
     this.x += this.vx;
     this.y += this.vy;

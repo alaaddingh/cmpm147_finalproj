@@ -1,23 +1,23 @@
 [
   {
-    "speed": 3,
-    "finSize": 10,
-    "size": 30,
+    "speed": "fast",
+    "finSize": "big",
+    "size": "small",
     "color": [255, 100, 100],
-    "lifespan": 3000
+    "lifespan": "short"
   },
   {
-    "speed": 2,
-    "finSize": 15,
-    "size": 40,
+    "speed": "slow",
+    "finSize": "small",
+    "size": "big",
     "color": [100, 200, 255],
-    "lifespan": 4000
+    "lifespan": "long"
   },
- {
-    "speed": 4,
-    "finSize": 12,
-    "size": 100,
+  {
+    "speed": "fast",
+    "finSize": "big",
+    "size": "small",
     "color": [200, 255, 100],
-    "lifespan": 2500
-}
+    "lifespan": "short"
+ }
 ]
