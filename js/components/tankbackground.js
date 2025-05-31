@@ -3,7 +3,7 @@ let tankBubbles = null;
 function tankbackground() {
   if (!tankBubbles) {
     tankBubbles = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 20; i++) {
       tankBubbles.push({
         x: random(width / 2 - width / 3, width / 2 + width / 3),
         y: random(height / 2, height / 2 + height * 0.35),
