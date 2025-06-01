@@ -25,21 +25,23 @@ const TANK = {
  */
 function loadfish() {
   if (!Array.isArray(fishData)) {
-  fishData = Object.values(fishData);
-}
+    fishData = Object.values(fishData);
+  }
+  
   for (let i = 0; i < fishData.length; i++) {
     let f = fishData[i];
-    /**
-     *   ternary operator for fish json to determine traits
-     */
+    
+    // Create traits object directly from JSON
     let traits = {
-      aggression: f.aggression,
-      speed: f.speed === "fast" ? random(2, 4) : f.speed === "slow" ? random(0.5, 1.5) : random(1, 2),
-      finSize: f.finSize === "big" ? random(20, 30) : f.finSize === "small" ? random(5, 10) : random(10, 20),
-      size: f.size === "big" ? random(80, 120) : f.size === "small" ? random(40, 80) : random(30, 60),
+      speed: f.speed,
+      finSize: f.finSize,
+      size: f.size,
       color: color(f.color[0], f.color[1], f.color[2]),
-      lifespan: f.lifespan === "long" ? random(5000, 10000) : f.lifespan === "short" ? random(2000, 4000) : random(3000, 6000)
+      aggression: f.aggression,
+      lifespan: f.lifespan,
+      isSaltwater: f.isSaltwater
     };
+    
     let x = random(TANK.left() + traits.size / 2, TANK.right() - traits.size / 2);
     let y = random(TANK.top() + traits.size / 2, TANK.bottom() - traits.size / 2);
     fishArray.push(new Fish(x, y, traits));
