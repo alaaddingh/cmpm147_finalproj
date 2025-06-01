@@ -60,6 +60,7 @@ function setup() {
   cnv.position(0, 0); 
   imageMode(CENTER);
   loadfish();
+  generateRandomFish(50);
   console.log(fishArray);
 }
 
@@ -67,4 +68,37 @@ function draw() {
  // console.log(fishArray);
   tankbackground();
   updateAndDrawFish();
+}
+
+/**
+ * Generates COUNT number of random fish with varied traits
+ */
+function generateRandomFish(count) {
+  for (let i = 0; i < count; i++) {
+    let traits = {
+      speed: random(0.5, 3),        // Slower to faster swimmers
+      finSize: random(5, 25),       // Small to large fins
+      size: random(15, 50),         // Small to medium fish
+      color: color(
+        random(50, 255),
+        random(50, 255),
+        random(50, 255)
+      ),
+      aggression: random(0, 1),     // 0-1 scale
+      lifespan: random(1000, 3000), // Frames of lifespan
+      isSaltwater: random() > 0.5   // Random water type
+    };
+
+    // Make sure it fits in the tank
+    let x = random(
+      TANK.left() + traits.size/2, 
+      TANK.right() - traits.size/2
+    );
+    let y = random(
+      TANK.top() + traits.size/2, 
+      TANK.bottom() - traits.size/2
+    );
+
+    fishArray.push(new Fish(x, y, traits));
+  }
 }
