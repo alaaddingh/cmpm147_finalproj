@@ -60,7 +60,7 @@ function setup() {
   cnv.position(0, 0); 
   imageMode(CENTER);
   loadfish();
-  generateRandomFish(50);
+  generateRandomFish(10);
   console.log(fishArray);
 }
 
