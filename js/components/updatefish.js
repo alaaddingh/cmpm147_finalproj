@@ -8,6 +8,30 @@ function updateAndDrawFish() {
   }
 
   // Check interactions
+  fishArrayCollision(fishArray, newFish);
+
+  // Add all new fish to main array
+  if (newFish.length > 0) {
+    fishArray.push(...newFish); 
+  }
+
+  //Remove dead fish and display survivors
+  for (let i = fishArray.length - 1; i >= 0; i--) {
+    if (fishArray[i].alive) {
+      fishArray[i].display();
+    } else {
+      fishArray.splice(i, 1);
+    }
+  }
+}
+
+
+/**
+ * Checks for interactions between all fish
+ * attempts to breed and eat
+ */
+function fishArrayCollision(fishArray, newFish) {
+  // Check interactions
   for (let i = 0; i < fishArray.length; i++) {
     if (!fishArray[i].alive) continue;
     
@@ -21,20 +45,6 @@ function updateAndDrawFish() {
       } else {
         fishArray[i].eatFish(other);
       }
-    }
-  }
-
-  // Add all new fish to main array
-  if (newFish.length > 0) {
-    fishArray.push(...newFish); 
-  }
-
-  //Remove dead fish and display survivors
-  for (let i = fishArray.length - 1; i >= 0; i--) {
-    if (fishArray[i].alive) {
-      fishArray[i].display();
-    } else {
-      fishArray.splice(i, 1);
     }
   }
 }
