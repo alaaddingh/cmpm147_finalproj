@@ -121,7 +121,7 @@ class Fish {
       if (this.isSaltwater !== other.isSaltwater || 
           this.energy < 50 || other.energy < 50 ||
           this.age > this.lifespan * 0.8 || other.age > other.lifespan * 0.8 || 
-          this.age < 50 || other.age < 50) {
+          this.age < 200 || other.age < 200) {
         return null;
       }
       
