@@ -4,6 +4,7 @@
     "finSize": 20,
     "size": 25,
     "color": [255, 100, 100],
+
     "aggression": 0.2,
     "lifespan": 1000,
     "isSaltwater": true
