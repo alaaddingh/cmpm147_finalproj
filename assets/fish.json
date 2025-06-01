@@ -4,20 +4,23 @@
     "finSize": "big",
     "size": "small",
     "color": [255, 100, 100],
-    "lifespan": "short"
+    "lifespan": "short",
+    "aggression": 0.5
   },
   {
     "speed": "slow",
     "finSize": "small",
     "size": "big",
     "color": [100, 200, 255],
-    "lifespan": "long"
+    "lifespan": "long",
+    "aggression": 0.7
   },
   {
     "speed": "fast",
     "finSize": "big",
     "size": "small",
     "color": [200, 255, 100],
-    "lifespan": "short"
- }
+    "lifespan": "short",
+    "aggression": 0.5
+  }
 ]

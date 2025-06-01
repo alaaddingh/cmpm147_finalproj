@@ -7,6 +7,7 @@ class Fish {
     this.size = traits.size;
     this.color = traits.color;
     this.lifespan = traits.lifespan; 
+    this.aggression = traits.aggression;
     this.age = 0;
     this.alive = true;
 
@@ -78,9 +79,74 @@ class Fish {
     this.checkBounds();
   }
 
+ 
   display() {
-    fill(this.color);
-    noStroke();
-    ellipse(this.x, this.y, this.size, this.size);
+  push();
+  translate(this.x, this.y);
+  let angle = atan2(this.vy, this.vx);
+  rotate(angle);
+  if (this.vx < 0) {
+    scale(1, -1);
   }
+
+  // BODY (main ellipse)
+  fill(this.color);
+  noStroke();
+  ellipse(0, 0, this.size, this.size * 0.6);
+
+  // HEAD (smaller ellipse)
+  fill(lerpColor(this.color, color(255), 0.2));
+  ellipse(this.size * 0.25, 0, this.size * 0.5, this.size * 0.5 * 0.6);
+
+  // TAIL (angled triangle)
+  fill(lerpColor(this.color, color(255), 0.5));
+  let tailW = this.finSize;
+  let tailH = this.size * 0.5;
+  triangle(
+    -this.size / 2, 0,
+    -this.size / 2 - tailW, -tailH / 3,
+    -this.size / 2 - tailW, tailH / 3
+  );
+
+  // TOP FIN (curved)
+  fill(lerpColor(this.color, color(255,255,255), 0.3));
+  beginShape();
+  vertex(-this.size * 0.1, -this.size * 0.3);
+  bezierVertex(
+    0, -this.size * 0.7,
+    this.finSize * 0.5, -this.size * 0.7,
+    this.size * 0.2, -this.size * 0.3
+  );
+  endShape(CLOSE);
+
+  // BOTTOM FIN
+  fill(lerpColor(this.color, color(0,0,0), 0.2));
+  ellipse(0, this.size * 0.25, this.finSize * 0.7, this.finSize * 0.3);
+
+  // EYE
+  fill(255);
+  ellipse(this.size * 0.18, -this.size * 0.1, this.size * 0.13, this.size * 0.13);
+  fill(0);
+  ellipse(this.size * 0.18, -this.size * 0.1, this.size * 0.07, this.size * 0.07);
+  fill(255,255,255,180);
+  ellipse(this.size * 0.20, -this.size * 0.12, this.size * 0.025, this.size * 0.025);
+  
+  // FURROWED EYEBROW for aggressive fish
+  if (this.aggression > 0.5) {
+    stroke(60, 30, 30);
+    strokeWeight(3);
+    line(
+      this.size * 0.13, -this.size * 0.18,
+      this.size * 0.23, -this.size * 0.14
+    );
+    noStroke();
+  }
+  // MOUTH
+  stroke(80, 40, 40);
+  strokeWeight(2);
+  noFill();
+  arc(this.size * 0.28, this.size * 0.05, this.size * 0.08, this.size * 0.05, 0, PI);
+
+  pop();
+}
 }

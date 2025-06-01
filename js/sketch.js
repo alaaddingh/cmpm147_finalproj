@@ -33,9 +33,10 @@ function loadfish() {
      *   ternary operator for fish json to determine traits
      */
     let traits = {
+      aggression: f.aggression,
       speed: f.speed === "fast" ? random(2, 4) : f.speed === "slow" ? random(0.5, 1.5) : random(1, 2),
       finSize: f.finSize === "big" ? random(20, 30) : f.finSize === "small" ? random(5, 10) : random(10, 20),
-      size: f.size === "big" ? random(50, 100) : f.size === "small" ? random(20, 40) : random(30, 60),
+      size: f.size === "big" ? random(80, 120) : f.size === "small" ? random(40, 80) : random(30, 60),
       color: color(f.color[0], f.color[1], f.color[2]),
       lifespan: f.lifespan === "long" ? random(5000, 10000) : f.lifespan === "short" ? random(2000, 4000) : random(3000, 6000)
     };
