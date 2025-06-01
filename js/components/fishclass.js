@@ -2,6 +2,7 @@ class Fish {
   constructor(x, y, traits = {}) {
     this.x = x;
     this.y = y;
+    this.baseY = y; // used for tickspeed
     this.speed = traits.speed;
     this.finSize = traits.finSize;
     this.size = traits.size;
@@ -12,10 +13,11 @@ class Fish {
     this.energy = 100; // Used for breeding and lifespan
     this.alive = true;
     this.isSaltwater = traits.isSaltwater;
+    this.swimTime = random(TWO_PI);
     // motion properties
     this.setInitialMotion();
     this.swimOffset = random(TWO_PI);
-    this.swimAmplitude = random(1, 4);
+    this.swimAmplitude = random(4, 8);
     this.swimFrequency = random(0.05, 0.1);
   }
 
@@ -31,6 +33,14 @@ class Fish {
     this.vy = sin(angle) * this.speed * 0.3;
   }
 
+
+  /**
+   * determines if mouse is over the fish
+   */ 
+
+  isMouseOver() {
+    return dist(mouseX, mouseY, this.x, this.y) < this.size / 2;
+  }
   /**
    * Checks if fish is alive
    * We can possibly remove age and use energy instead
@@ -42,7 +52,7 @@ class Fish {
     if (this.age >= this.lifespan) {
       this.alive = false;
     } else {
-      this.age++;
+      this.age += tickSpeed;
     }
     return this.alive;
   }
@@ -61,7 +71,7 @@ class Fish {
     if (this.y - this.size / 2 < TANK.top() || this.y + this.size / 2 > TANK.bottom()) {
       this.vy *= -1;
       bounced = true;
-      this.y = constrain(this.y, TANK.top() + this.size / 2, TANK.bottom() - this.size / 2);
+      this.baseY = constrain(this.baseY, TANK.top() + this.size / 2, TANK.bottom() - this.size / 2);
     }
     if (bounced) this.swimOffset = random(TWO_PI);
   }
@@ -70,9 +80,12 @@ class Fish {
    *  updates motion per frame
    */
   move() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.y += sin(frameCount * this.swimFrequency + this.swimOffset) * this.swimAmplitude;
+    this.x += this.vx * tickSpeed;
+    this.baseY += this.vy * tickSpeed;
+    this.swimTime += this.swimFrequency * tickSpeed;
+    this.y = this.baseY + sin(this.swimTime + this.swimOffset) * this.swimAmplitude;
+
+   
   }
   /**
    *  Checks if this fish collides with another fish
@@ -150,7 +163,7 @@ class Fish {
       fishArray.splice(fishArray.indexOf(this), 1);
       return;
     }
-    this.energy -= 0.1;
+    this.energy -= 0.1 * tickSpeed;
     // Collision Check
     let other = this.checkCollision(fishArray);
     if (other) {

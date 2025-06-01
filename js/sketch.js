@@ -2,6 +2,9 @@ let img;
 let cnv;
 let fishData;
 let fishArray = [];
+let tickSlider;
+let tickSpeed = 1;
+let tickLabel; // For the slider label
 
 /**
  * GLOBAL TANK VARIABLES
@@ -56,18 +59,64 @@ function preload() {
 
 function setup() {
   background(100);
-  cnv = createCanvas(windowWidth, windowHeight);
-  cnv.position(0, 0); 
+  let cnvScale = 0.8;
+  let cWidth = windowWidth * cnvScale;
+  let cHeight = windowHeight * cnvScale;
+
+  let xPos = (windowWidth - cWidth) / 2;
+  let yPos = 80; 
+
+  cnv = createCanvas(cWidth, cHeight);
+  cnv.position(xPos, yPos);
   imageMode(CENTER);
   loadfish();
   generateRandomFish(10);
   console.log(fishArray);
+
+  // Place the slider at a fixed position (e.g., top left)
+  tickSlider = createSlider(0.1, 3, 1, 0.01);
+  tickSlider.position(15, 200);
+  tickSlider.style('width', '200px');
+
+  // Create the label and position it next to the slider
+  tickLabel = createDiv('Speed: ' + tickSpeed.toFixed(2) + 'x');
+  tickLabel.position(200, 100); 
+  tickLabel.style('color', '#000');
+  tickLabel.style('font-size', '16px');
+  tickLabel.style('font-family', 'sans-serif');
+  tickLabel.style('user-select', 'none');
+  tickLabel.style('text-shadow', '1px 1px 2px #000');
 }
 
 function draw() {
- // console.log(fishArray);
+  tickSpeed = tickSlider.value();
   tankbackground();
   updateAndDrawFish();
+  showFishStats();
+
+  // Update the label text and keep it below the slider
+  tickLabel.html('Speed: ' + tickSpeed.toFixed(2) + 'x');
+  tickLabel.position(tickSlider.x, tickSlider.y + tickSlider.height + 20);
+}
+
+function showFishStats() {
+  for (let fish of fishArray) {
+    if (fish.isMouseOver()) {
+      let stats = 
+       `Speed: ${fish.speed}
+Fin Size: ${fish.finSize}
+Size: ${fish.size}
+Aggression: ${fish.aggression}
+Lifespan: ${fish.lifespan}
+Saltwater: ${fish.isSaltwater ? "Yes" : "No"}`;
+      fill(255, 230);
+      stroke(0);
+      strokeWeight(2);
+      textAlign(LEFT, TOP);
+      textSize(14);
+      text(stats, fish.x + fish.size / 2 + 10, fish.y - fish.size / 2);
+    }
+  }
 }
 
 /**
