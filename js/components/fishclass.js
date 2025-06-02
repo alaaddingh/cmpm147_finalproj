@@ -133,9 +133,8 @@ class Fish {
     breed(other) {
       // Check breeding compatibility
       if (this.isSaltwater !== other.isSaltwater || 
-          this.energy < 25 || other.energy < 25 ||
-          this.age > this.lifespan * 0.8 || other.age > other.lifespan * 0.8 || 
-          this.age < 1000 || other.age < 1000) {
+          this.energy < 5 || other.energy < 5 || 
+          this.age < 100 || other.age < 100) {
         return null;
       }
       
