@@ -1,8 +1,8 @@
 let img;
 let cnv;
-let initialPlanktonCount = 40;
+let initialPlanktonCount = 100;
 let planktoncount = initialPlanktonCount; 
-let planktonCooldown = 1000;
+let planktonCooldown = 100;
 let planktonTimer = 0;
 let fishData;
 let fishArray = [];
@@ -180,15 +180,15 @@ function generateRandomFish(count) {
   for (let i = 0; i < count; i++) {
     let traits = {
       speed: random(0.5, 3),        // Slower to faster swimmers
-      finSize: random(5, 25),       // Small to large fins
-      size: random(15, 50),         // Small to medium fish
+      finSize: Math.floor(random(5, 25)),       // Small to large fins
+      size: Math.floor(random(15, 50)),         // Small to medium fish
       color: color(
         random(50, 255),
         random(50, 255),
         random(50, 255)
       ),
       aggression: random(0, 1),     // 0-1 scale
-      lifespan: random(1000, 3000), // Frames of lifespan
+      lifespan: Math.floor(random(80, 250)), // Frames of lifespan
       isSaltwater: random() > 0.5   // Random water type
     };
 

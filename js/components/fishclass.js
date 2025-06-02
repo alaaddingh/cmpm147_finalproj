@@ -3,15 +3,15 @@ class Fish {
     this.x = x;
     this.y = y;
     this.baseY = y; // used for tickspeed
-    this.maxEnergy = 100;
+    this.maxEnergy = traits.lifespan; // How long without eating before death
     this.speed = traits.speed;
     this.finSize = traits.finSize;
     this.size = traits.size;
     this.color = traits.color;
     this.aggression = traits.aggression;
-    this.lifespan = traits.lifespan;  // How long without eating before death
+    this.lifespan = traits.lifespan;  
     this.age = 0;
-    this.energy = 100; // Used for breeding and lifespan
+    this.energy = 50; // Used for breeding and lifespan
     this.alive = true;
     this.isSaltwater = traits.isSaltwater;
     this.swimTime = random(TWO_PI);
@@ -50,7 +50,7 @@ class Fish {
    * maybe energy < 30%, fish moves slower?
    */
   isAlive() {
-    if (this.age >= this.lifespan) {
+    if (this.energy <= 0) {
       this.alive = false;
     } else {
       this.age += tickSpeed;
@@ -133,9 +133,9 @@ class Fish {
     breed(other) {
       // Check breeding compatibility
       if (this.isSaltwater !== other.isSaltwater || 
-          this.energy < 50 || other.energy < 50 ||
+          this.energy < 25 || other.energy < 25 ||
           this.age > this.lifespan * 0.8 || other.age > other.lifespan * 0.8 || 
-          this.age < 200 || other.age < 200) {
+          this.age < 1000 || other.age < 1000) {
         return null;
       }
       
