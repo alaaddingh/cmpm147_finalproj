@@ -7,7 +7,8 @@
 
     "aggression": 0.2,
     "lifespan": 100,
-    "isSaltwater": true
+    "salinityPreference": 80,
+    "salinityTolerance": 20
   },
   {
     "speed": 1.2,
@@ -16,7 +17,8 @@
     "color": [100, 200, 255],
     "aggression": 0.8,
     "lifespan": 200,
-    "isSaltwater": false
+    "salinityPreference": 30,
+    "salinityTolerance": 30
   },
   {
     "speed": 2.7,
@@ -25,7 +27,8 @@
     "color": [200, 255, 100],
     "aggression": 0.5,
     "lifespan": 120,
-    "isSaltwater": true
+    "salinityPreference": 0,
+    "salinityTolerance": 40
   },
   {
     "speed": 2.3,
@@ -34,7 +37,8 @@
     "color": [255, 150, 50],
     "aggression": 0.3,
     "lifespan": 110,
-    "isSaltwater": false
+    "salinityPreference": 100,
+    "salinityTolerance": 40
   },
   {
     "speed": 1.5,
@@ -43,7 +47,8 @@
     "color": [80, 180, 220],
     "aggression": 0.7,
     "lifespan": 180,
-    "isSaltwater": true
+    "salinityPreference": 50,
+    "salinityTolerance": 25
   },
   {
     "speed": 2.0,
@@ -52,7 +57,8 @@
     "color": [220, 100, 220],
     "aggression": 0.4,
     "lifespan": 150,
-    "isSaltwater": false
+    "salinityPreference": 80,
+    "salinityTolerance": 15
   },
   {
     "speed": 2.8,
@@ -61,7 +67,8 @@
     "color": [100, 255, 150],
     "aggression": 0.6,
     "lifespan": 90,
-    "isSaltwater": true
+    "salinityPreference": 35,
+    "salinityTolerance": 10
   },
   {
     "speed": 1.0,
@@ -70,7 +77,8 @@
     "color": [50, 100, 255],
     "aggression": 0.9,
     "lifespan": 2200,
-    "isSaltwater": false
+    "salinityPreference": 80,
+    "salinityTolerance": 25
   },
   {
     "speed": 2.5,
@@ -79,7 +87,8 @@
     "color": [255, 100, 100],
     "aggression": 0.2,
     "lifespan": 100,
-    "isSaltwater": true
+    "salinityPreference": 75,
+    "salinityTolerance": 10
   },
   {
     "speed": 1.2,
@@ -88,7 +97,8 @@
     "color": [100, 200, 255],
     "aggression": 0.8,
     "lifespan": 200,
-    "isSaltwater": false
+    "salinityPreference": 0,
+    "salinityTolerance": 35
   },
   {
     "speed": 2.7,
@@ -97,7 +107,8 @@
     "color": [200, 255, 100],
     "aggression": 0.5,
     "lifespan": 120,
-    "isSaltwater": true
+    "salinityPreference": 50,
+    "salinityTolerance": 25
   },
   {
     "speed": 2.3,
@@ -106,7 +117,8 @@
     "color": [255, 150, 50],
     "aggression": 0.3,
     "lifespan": 110,
-    "isSaltwater": false
+    "salinityPreference": 20,
+    "salinityTolerance": 55
   },
   {
     "speed": 1.5,
@@ -115,7 +127,8 @@
     "color": [80, 180, 220],
     "aggression": 0.7,
     "lifespan": 180,
-    "isSaltwater": true
+    "salinityPreference": 80,
+    "salinityTolerance": 45
   },
   {
     "speed": 2.0,
@@ -124,7 +137,8 @@
     "color": [220, 100, 220],
     "aggression": 0.4,
     "lifespan": 150,
-    "isSaltwater": false
+    "salinityPreference": 100,
+    "salinityTolerance": 50
   },
   {
     "speed": 2.8,
@@ -133,7 +147,8 @@
     "color": [100, 255, 150],
     "aggression": 0.6,
     "lifespan": 90,
-    "isSaltwater": true
+    "salinityPreference": 65,
+    "salinityTolerance": 10
   },
   {
     "speed": 1.0,
@@ -142,6 +157,7 @@
     "color": [50, 100, 255],
     "aggression": 0.9,
     "lifespan": 220,
-    "isSaltwater": false
+    "salinityPreference": 90,
+    "salinityTolerance": 35
   }
 ]

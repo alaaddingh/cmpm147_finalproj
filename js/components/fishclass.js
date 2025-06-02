@@ -13,7 +13,10 @@ class Fish {
     this.age = 0;
     this.energy = 50; // Used for breeding and lifespan
     this.alive = true;
-    this.isSaltwater = traits.isSaltwater;
+    //this.isSaltwater = traits.isSaltwater;
+    this.salinityPreference = traits.salinityPreference || 50;
+    this.salinityTolerance = traits.salinityTolerance || 20;//a fallback value if not provided
+
     this.swimTime = random(TWO_PI);
     // motion properties
     this.setInitialMotion();
@@ -131,12 +134,17 @@ class Fish {
      *  Checks if this fish can breed with the other fish
      */
     breed(other) {
+    
       // Check breeding compatibility
-      if (this.isSaltwater !== other.isSaltwater || 
+      const salinityDiff = Math.abs(this.salinityPreference - other.salinityPreference);
+      const toleranceRange = Math.min(this.salinityTolerance, other.salinityTolerance);
+
+      if (salinityDiff > toleranceRange || 
           this.energy < 5 || other.energy < 5 || 
           this.age < 100 || other.age < 100) {
         return null;
       }
+
       
       // Genetic recombination with mutation
       let newTraits = {
@@ -146,7 +154,10 @@ class Fish {
         color: lerpColor(color(this.color), color(other.color), random(0.3, 0.7)),
         aggression: (this.aggression + other.aggression) / 2 * random(0.9, 1.1),
         lifespan: (this.lifespan + other.lifespan) / 2 * random(0.9, 1.1),
-        isSaltwater: this.isSaltwater
+        // isSaltwater: this.isSaltwater
+        salinityPreference: (this.salinityPreference + other.salinityPreference) / 2 + random(-5, 5),
+        salinityTolerance: (this.salinityTolerance + other.salinityTolerance) / 2 + random(-5, 5)
+
       };
       
      // console.log(self+" bred with "+other);
@@ -165,6 +176,14 @@ class Fish {
     }
 
     this.energy -= 0.1 * tickSpeed;
+
+
+    const deviation = Math.abs(salinityLevel - this.salinityPreference);
+    if (deviation > this.salinityTolerance) {
+      const penalty = (deviation - this.salinityTolerance) * 0.005;
+      this.energy -= penalty * tickSpeed;
+    }// fish loses energy if salinity is outside its tolerance range
+
     // Collision Check
     let other = this.checkCollision(fishArray);
     if (other) {

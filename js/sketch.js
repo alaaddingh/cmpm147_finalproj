@@ -11,6 +11,10 @@ let tickSlider;
 let tickSpeed = 1;
 let tickLabel; // For the slider label
 
+let salinitySlider;//slider for salinity
+let salinityLevel = 50; // default 50% saltwater
+let salinityLabel;
+
 /**
  * GLOBAL TANK VARIABLES
  */
@@ -47,7 +51,9 @@ function loadfish() {
       color: color(f.color[0], f.color[1], f.color[2]),
       aggression: f.aggression,
       lifespan: f.lifespan,
-      isSaltwater: f.isSaltwater
+      salinityPreference: f.salinityPreference,
+      salinityTolerance: f.salinityTolerance
+
     };
     
     let x = random(TANK.left() + traits.size / 2, TANK.right() - traits.size / 2);
@@ -133,10 +139,23 @@ function setup() {
   tickLabel.style('font-family', 'sans-serif');
   tickLabel.style('user-select', 'none');
   tickLabel.style('text-shadow', '1px 1px 2px #000');
+
+  salinitySlider = createSlider(0, 100, 50, 1);
+  salinitySlider.position(15, tickSlider.y + 60);
+  salinitySlider.style('width', '200px');
+
+  salinityLabel = createDiv('Salinity: ' + salinityLevel + '%');
+  salinityLabel.position(salinitySlider.x, salinitySlider.y + salinitySlider.height + 5);
+  salinityLabel.style('color', '#000');
+  salinityLabel.style('font-size', '16px');
+  salinityLabel.style('font-family', 'sans-serif');
+  salinityLabel.style('user-select', 'none');
+  salinityLabel.style('text-shadow', '1px 1px 2px #000');
 }
 
 function draw() {
   tickSpeed = tickSlider.value();
+  salinityLevel = salinitySlider.value();
   tankbackground();
   updateAndDrawFish();
   updateAndDrawPlankton();
@@ -151,18 +170,22 @@ function draw() {
   // Update the label text and keep it below the slider
   tickLabel.html('Speed: ' + tickSpeed.toFixed(2) + 'x');
   tickLabel.position(tickSlider.x, tickSlider.y + tickSlider.height + 20);
+
+  salinityLabel.html('Salinity: ' + salinityLevel + '%');
+  salinityLabel.position(salinitySlider.x, salinitySlider.y + salinitySlider.height + 5);
 }
 
-function showFishStats() {
+function showFishStats() {//rounded the stats so it doesn't look too cluttered
   for (let fish of fishArray) {
     if (fish.isMouseOver()) {
       let stats = 
-       `Speed: ${fish.speed}
-Fin Size: ${fish.finSize}
-Size: ${fish.size}
-Aggression: ${fish.aggression}
-Lifespan: ${fish.lifespan}
-Saltwater: ${fish.isSaltwater ? "Yes" : "No"}`;
+       `Speed: ${fish.speed.toFixed(2)}
+Fin Size: ${fish.finSize.toFixed(2)}
+Size: ${fish.size.toFixed(2)}
+Aggression: ${fish.aggression.toFixed(2)}
+Lifespan: ${fish.lifespan.toFixed(2)}
+Salinity Pref: ${fish.salinityPreference.toFixed(2)}%
+Tolerance: ±${fish.salinityTolerance.toFixed(2)}%`
       fill(255, 230);
       stroke(0);
       strokeWeight(2);
@@ -189,7 +212,8 @@ function generateRandomFish(count) {
       ),
       aggression: random(0, 1),     // 0-1 scale
       lifespan: Math.floor(random(80, 250)), // Frames of lifespan
-      isSaltwater: random() > 0.5   // Random water type
+      salinityPreference: random() > 0.5 ? 80 : 10,
+      salinityTolerance: random(10, 30)
     };
 
     // Make sure it fits in the tank
