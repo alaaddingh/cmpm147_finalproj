@@ -164,6 +164,8 @@ function draw() {
     planktonTimer = millis();
     generatePlaknton();
   }
+  
+  
   // maintainPlanktonCount();
   displayfishcount();
 
@@ -184,6 +186,7 @@ Fin Size: ${fish.finSize.toFixed(2)}
 Size: ${fish.size.toFixed(2)}
 Aggression: ${fish.aggression.toFixed(2)}
 Lifespan: ${fish.lifespan.toFixed(2)}
+Energy: ${fish.energy.toFixed(1)}
 Salinity Pref: ${fish.salinityPreference.toFixed(2)}%
 Tolerance: ±${fish.salinityTolerance.toFixed(2)}%`
       fill(255, 230);

@@ -16,6 +16,8 @@ class Fish {
     //this.isSaltwater = traits.isSaltwater;
     this.salinityPreference = traits.salinityPreference || 50;
     this.salinityTolerance = traits.salinityTolerance || 20;//a fallback value if not provided
+    
+    this.lastBreedTime = -Infinity; // timestamp of last breeding
 
     this.swimTime = random(TWO_PI);
     // motion properties
@@ -134,16 +136,20 @@ class Fish {
      *  Checks if this fish can breed with the other fish
      */
     breed(other) {
-    
+      
+      let now = millis();
+      let breedCooldown = 5000; // 5 seconds cooldown to stop exponential breeding
       // Check breeding compatibility
       const salinityDiff = Math.abs(this.salinityPreference - other.salinityPreference);
       const toleranceRange = Math.min(this.salinityTolerance, other.salinityTolerance);
 
       if (salinityDiff > toleranceRange || 
-          this.energy < 5 || other.energy < 5 || 
-          this.age < 100 || other.age < 100) {
-        return null;
-      }
+      this.energy < 5 || other.energy < 5 || 
+      this.age < 100 || other.age < 100 || 
+      now - this.lastBreedTime < breedCooldown || 
+      now - other.lastBreedTime < breedCooldown) {
+    return null;
+  }
 
       
       // Genetic recombination with mutation
@@ -162,6 +168,9 @@ class Fish {
       
      // console.log(self+" bred with "+other);
       // Position offspring between parents
+
+      this.lastBreedTime = now;
+      other.lastBreedTime = now;
       return new Fish(
         (this.x + other.x) / 2,
         (this.y + other.y) / 2,
