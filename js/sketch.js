@@ -62,6 +62,29 @@ function loadfish() {
   }
 }
 
+function spawnRandomFishFromJSON() {
+  if (!fishData || fishData.length === 0) return;
+
+  const randomIndex = floor(random(fishData.length));
+  const f = fishData[randomIndex];
+
+  let traits = {
+    speed: f.speed,
+    finSize: f.finSize,
+    size: f.size,
+    color: color(f.color[0], f.color[1], f.color[2]),
+    aggression: f.aggression,
+    lifespan: f.lifespan,
+    salinityPreference: f.salinityPreference,
+    salinityTolerance: f.salinityTolerance
+  };
+
+  let x = random(TANK.left() + traits.size / 2, TANK.right() - traits.size / 2);
+  let y = random(TANK.top() + traits.size / 2, TANK.bottom() - traits.size / 2);
+  fishArray.push(new Fish(x, y, traits));
+}
+
+
 
 /**
  * Always maintain  planktoncount of plankton in the tank
@@ -151,6 +174,20 @@ function setup() {
   salinityLabel.style('font-family', 'sans-serif');
   salinityLabel.style('user-select', 'none');
   salinityLabel.style('text-shadow', '1px 1px 2px #000');
+
+
+
+  //spawn button to spawn random fish from JSON
+  let spawnButton = createButton('Spawn Random Fish');
+  spawnButton.position(salinitySlider.x, salinityLabel.y + 40);
+  spawnButton.mousePressed(spawnRandomFishFromJSON);
+  spawnButton.style('font-size', '14px');
+  spawnButton.style('padding', '6px 12px');
+  spawnButton.style('background-color', '#55aaff');
+  spawnButton.style('color', 'white');
+  spawnButton.style('border', 'none');
+  spawnButton.style('border-radius', '5px');
+  spawnButton.style('cursor', 'pointer');
 }
 
 function draw() {

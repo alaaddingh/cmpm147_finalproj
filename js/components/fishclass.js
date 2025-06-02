@@ -138,7 +138,7 @@ class Fish {
     breed(other) {
       
       let now = millis();
-      let breedCooldown = 5000; // 5 seconds cooldown to stop exponential breeding
+      let breedCooldown = 3000; // 3 seconds cooldown to stop exponential breeding
       // Check breeding compatibility
       const salinityDiff = Math.abs(this.salinityPreference - other.salinityPreference);
       const toleranceRange = Math.min(this.salinityTolerance, other.salinityTolerance);
