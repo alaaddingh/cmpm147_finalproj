@@ -1,7 +1,9 @@
 let img;
 let cnv;
+let planktoncount = 40; 
 let fishData;
 let fishArray = [];
+let planktonArray = [];
 let tickSlider;
 let tickSpeed = 1;
 let tickLabel; // For the slider label
@@ -51,10 +53,33 @@ function loadfish() {
   }
 }
 
+
+/**
+ * Always maintain  planktoncount of plankton in the tank
+ */
+function maintainPlanktonCount() {
+    while (planktonArray.length < planktoncount) {
+        let size = random(3, 6);
+        let speed = random(0.5, 1.5); 
+        let x = random(TANK.left() + size / 2, TANK.right() - size / 2);
+        let y = random(TANK.top() + size / 2, TANK.bottom() - size / 2);
+        planktonArray.push(new Plankton(x, y, { size: size, speed: speed }));
+    }
+}
 function preload() {
   img = loadImage('./assets/melvins_fishtank.png'); 
   fishData = loadJSON('./assets/fish.json');
   console.log(fishData);
+}
+
+/**
+ * screen display of fish count
+ */
+function displayfishcount() {
+  fill(255);
+  textSize(16);
+  textAlign(LEFT, TOP);
+  text('Fish Count: ' + fishArray.length, 10, 10);
 }
 
 function setup() {
@@ -92,7 +117,10 @@ function draw() {
   tickSpeed = tickSlider.value();
   tankbackground();
   updateAndDrawFish();
+  updateAndDrawPlankton();
   showFishStats();
+  maintainPlanktonCount();
+  displayfishcount();
 
   // Update the label text and keep it below the slider
   tickLabel.html('Speed: ' + tickSpeed.toFixed(2) + 'x');

@@ -3,6 +3,7 @@ class Fish {
     this.x = x;
     this.y = y;
     this.baseY = y; // used for tickspeed
+    this.maxEnergy = 100;
     this.speed = traits.speed;
     this.finSize = traits.finSize;
     this.size = traits.size;
@@ -120,7 +121,7 @@ class Fish {
       // Successfully eat the other fish
       this.energy += other.size * 5; // Gain energy based on prey size
       other.alive = false; // Set as dead, updateFish.js will handle removal
-      console.log(this+" ate "+other);
+    //  console.log(this+" ate "+other);
       return true;
     }
     return false;
@@ -149,7 +150,7 @@ class Fish {
         isSaltwater: this.isSaltwater
       };
       
-      console.log(self+" bred with "+other);
+     // console.log(self+" bred with "+other);
       // Position offspring between parents
       return new Fish(
         (this.x + other.x) / 2,
@@ -163,6 +164,7 @@ class Fish {
       fishArray.splice(fishArray.indexOf(this), 1);
       return;
     }
+
     this.energy -= 0.1 * tickSpeed;
     // Collision Check
     let other = this.checkCollision(fishArray);
@@ -178,6 +180,9 @@ class Fish {
     }
     this.move();
     this.checkBounds();
+
+    // Random chance of death
+    if (random() < 0.00015) this.alive = false;
   }
 
  

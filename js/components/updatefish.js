@@ -40,8 +40,8 @@ function fishArrayCollision(fishArray, newFish) {
       let offspring = fishArray[i].breed(other);
       if (offspring) {
         newFish.push(offspring);  // Store in temporary array
-        fishArray[i].energy -= 50;
-        other.energy -= 50;
+        fishArray[i].energy -= 45;
+        other.energy -= 45;
       } else {
         fishArray[i].eatFish(other);
       }
