@@ -10,7 +10,8 @@ let planktonArray = [];
 let tickSlider;
 let tickSpeed = 1;
 let tickLabel; // For the slider label
-
+let selectedFish = null; //sidepanel stuff
+let sidePanel; //sidepanel stuff
 let salinitySlider;//slider for salinity
 let salinityLevel = 50; // default 50% saltwater
 let salinityLabel;
@@ -204,6 +205,9 @@ function setup() {
   salinityLabel.style('user-select', 'none');
   salinityLabel.style('text-shadow', '1px 1px 2px #000');
 
+  //side panekl setup
+  let panelWidth = 200; // or any width you want!
+  sidePanel = new SidePanel(width -panelWidth/2, 0, panelWidth, height);
 
 
   //spawn button to spawn random fish from JSON
@@ -245,6 +249,9 @@ function draw() {
 
     drawFeeder();
     updateAndDrawFood();
+
+    
+  sidePanel.display(selectedFish);
 
 
 }
@@ -361,7 +368,17 @@ function saveFishStats() {
 
 function mousePressed() {
   console.log("Mouse pressed at: ", mouseX, mouseY);
+  //fish sellection handler for side panel
+  selectedFish = null;
+  for (let fish of fishArray) {
+    if (dist(mouseX, mouseY, fish.x, fish.y) < fish.size / 2) {
+      selectedFish = fish;
+      break;
+    }
+  }
   saveFishStats();
+  //ends here
+
   mousePressedFeeder();
 }
 
@@ -371,4 +388,9 @@ function mouseDragged() {
 
 function mouseReleased() {
   mouseReleasedFeeder();
+}
+//SID E PANEL STUFF
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  sidePanel = new SidePanel(width - panelWidth, 0, panelWidth, height);
 }
