@@ -177,9 +177,10 @@ function setup() {
   salinityLabel.style('font-family', 'sans-serif');
   salinityLabel.style('user-select', 'none');
   salinityLabel.style('text-shadow', '1px 1px 2px #000');
+
   //side panekl setup
-  let panelWidth = 150; // or any width you want!
-  sidePanel = new SidePanel(width - panelWidth, 0, panelWidth, height);
+  let panelWidth = 200; // or any width you want!
+  sidePanel = new SidePanel(width -panelWidth/2, 0, panelWidth, height);
 
 
   //spawn button to spawn random fish from JSON
