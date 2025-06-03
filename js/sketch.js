@@ -119,6 +119,7 @@ function generateInitialPlankton(count) {
 function preload() {
   img = loadImage('./assets/melvins_fishtank.png'); 
   fishData = loadJSON('./assets/fish.json');
+  preloadFeeder();
   console.log(fishData);
 }
 
@@ -148,6 +149,7 @@ function setup() {
   generateRandomFish(10);
   console.log(fishArray);
   generateInitialPlankton(initialPlanktonCount);
+  setupFeeder();
 
   // Place the slider at a fixed position (e.g., top left)
   tickSlider = createSlider(0.1, 3, 1, 0.01);
@@ -194,6 +196,7 @@ function draw() {
   tickSpeed = tickSlider.value();
   salinityLevel = salinitySlider.value();
   tankbackground();
+
   updateAndDrawFish();
   updateAndDrawPlankton();
   showFishStats();
@@ -212,6 +215,11 @@ function draw() {
 
   salinityLabel.html('Salinity: ' + salinityLevel + '%');
   salinityLabel.position(salinitySlider.x, salinitySlider.y + salinitySlider.height + 5);
+
+    drawFeeder();
+    updateAndDrawFood();
+
+
 }
 
 function showFishStats() {//rounded the stats so it doesn't look too cluttered
@@ -268,4 +276,18 @@ function generateRandomFish(count) {
 
     fishArray.push(new Fish(x, y, traits));
   }
+}
+
+
+function mousePressed() {
+  console.log("Mouse pressed at: ", mouseX, mouseY);
+  mousePressedFeeder();
+}
+
+function mouseDragged() {
+  mouseDraggedFeeder();
+}
+
+function mouseReleased() {
+  mouseReleasedFeeder();
 }
