@@ -87,6 +87,28 @@ function spawnRandomFishFromJSON() {
   fishArray.push(new Fish(x, y, traits));
 }
 
+function spawnFishFromBreeding() {
+  let traits = {
+    speed: getRandomTraitNumber(min(savedStats1.speed, savedStats2.speed), max(savedStats1.speed, savedStats2.speed)),
+    finSize: getRandomTraitNumber(min(savedStats1.finSize, savedStats2.finSize), max(savedStats1.finSize, savedStats2.finSize)),
+    size: getRandomTraitNumber(min(savedStats1.size, savedStats2.size), max(savedStats1.size, savedStats2.size)),
+    color: color(getRandomTraitNumber(min(savedStats1.color[0], savedStats2.color[0]), max(savedStats1.color[0], savedStats2.color[0])), getRandomTraitNumber(min(savedStats1.color[1], savedStats2.color[1]), max(savedStats1.color[1], savedStats2.color[1])), getRandomTraitNumber(min(savedStats1.color[2], savedStats2.color[2]), max(savedStats1.color[2], savedStats2.color[2]))),
+    aggression: getRandomTraitNumber(min(savedStats1.aggression, savedStats2.aggression), max(savedStats1.aggression, savedStats2.aggression)),
+    lifespan: getRandomTraitNumber(min(savedStats1.lifespan, savedStats2.lifespan), max(savedStats1.lifespan, savedStats2.lifespan)),
+    salinityPreference: getRandomTraitNumber(min(savedStats1.salinityPreference, savedStats2.salinityPreference), max(savedStats1.salinityPreference, savedStats2.salinityPreference)),
+    salinityTolerance: getRandomTraitNumber(min(savedStats1.salinityTolerance, savedStats2.salinityTolerance), max(savedStats1.salinityTolerance, savedStats2.salinityTolerance)),
+  };
+
+  console.log("Breeding new fish with");
+  console.log(traits);
+  let x = random(TANK.left() + traits.size / 2, TANK.right() - traits.size / 2);
+  let y = random(TANK.top() + traits.size / 2, TANK.bottom() - traits.size / 2);
+  fishArray.push(new Fish(x, y, traits));
+}
+
+function getRandomTraitNumber(min, max){
+  return Math.random() * (max - min) + min;
+}
 
 
 /**
@@ -288,6 +310,7 @@ function generateRandomFish(count) {
 }
 
 function breedFish(){
+  spawnFishFromBreeding();
   savedStats1 = "nothing";
   savedStats2 = "nothing";
 }
@@ -296,16 +319,17 @@ function saveFishStats() {
   if(savedStats1 == "nothing"){
     for (let fish of fishArray) {
       if (fish.isMouseOver()) {
-        savedStats1 = 
-        `Speed: ${fish.speed.toFixed(2)}
-          Fin Size: ${fish.finSize.toFixed(2)}
-          Size: ${fish.size.toFixed(2)}
-          Aggression: ${fish.aggression.toFixed(2)}
-          Lifespan: ${fish.lifespan.toFixed(2)}
-          Energy: ${fish.energy.toFixed(1)}
-          Salinity Pref: ${fish.salinityPreference.toFixed(2)}%
-          Tolerance: ±${fish.salinityTolerance.toFixed(2)}%`
-
+        savedStats1 = {
+          speed: fish.speed,
+          finSize: fish.finSize,
+          size: fish.size,
+          color: fish.color,
+          aggression: fish.aggression,
+          lifespan: fish.lifespan,
+          energy: fish.energy,
+          salinityPreference: fish.salinityPreference,
+          salinityTolerance: fish.salinityTolerance
+        }
           break;
               }
       savedStats1 = "nothing";
@@ -314,16 +338,17 @@ function saveFishStats() {
   else {
     for (let fish of fishArray){
       if(fish.isMouseOver()){
-        savedStats2 = 
-        `Speed: ${fish.speed.toFixed(2)}
-          Fin Size: ${fish.finSize.toFixed(2)}
-          Size: ${fish.size.toFixed(2)}
-          Aggression: ${fish.aggression.toFixed(2)}
-          Lifespan: ${fish.lifespan.toFixed(2)}
-          Energy: ${fish.energy.toFixed(1)}
-          Salinity Pref: ${fish.salinityPreference.toFixed(2)}%
-          Tolerance: ±${fish.salinityTolerance.toFixed(2)}%`
-
+        savedStats2 = {
+          speed: fish.speed,
+          finSize: fish.finSize,
+          size: fish.size,
+          color: fish.color,
+          aggression: fish.aggression,
+          lifespan: fish.lifespan,
+          energy: fish.energy,
+          salinityPreference: fish.salinityPreference,
+          salinityTolerance: fish.salinityTolerance
+      }
         breedFish();
         break;
       }
