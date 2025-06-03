@@ -376,6 +376,7 @@ function mousePressed() {
       break;
     }
   }
+  saveFishStats();
   //ends here
 
   mousePressedFeeder();
