@@ -31,6 +31,9 @@ const TANK = {
   usableHeight: () => TANK.h() * 0.75
 };
 
+  let savedStats1 = "nothing";
+  let savedStats2 = "nothing";
+
 /**
  * processes fish JSON data
  *
@@ -142,6 +145,8 @@ function setup() {
   let xPos = (windowWidth - cWidth) / 2;
   let yPos = 80; 
 
+
+
   cnv = createCanvas(cWidth, cHeight);
   cnv.position(xPos, yPos);
   imageMode(CENTER);
@@ -240,7 +245,11 @@ Tolerance: ±${fish.salinityTolerance.toFixed(2)}%`
       textAlign(LEFT, TOP);
       textSize(14);
       text(stats, fish.x + fish.size / 2 + 10, fish.y - fish.size / 2);
+      fill(255, 255);
+
+      
     }
+
   }
 }
 
@@ -278,9 +287,56 @@ function generateRandomFish(count) {
   }
 }
 
+function breedFish(){
+  savedStats1 = "nothing";
+  savedStats2 = "nothing";
+}
+
+function saveFishStats() {
+  if(savedStats1 == "nothing"){
+    for (let fish of fishArray) {
+      if (fish.isMouseOver()) {
+        savedStats1 = 
+        `Speed: ${fish.speed.toFixed(2)}
+          Fin Size: ${fish.finSize.toFixed(2)}
+          Size: ${fish.size.toFixed(2)}
+          Aggression: ${fish.aggression.toFixed(2)}
+          Lifespan: ${fish.lifespan.toFixed(2)}
+          Energy: ${fish.energy.toFixed(1)}
+          Salinity Pref: ${fish.salinityPreference.toFixed(2)}%
+          Tolerance: ±${fish.salinityTolerance.toFixed(2)}%`
+
+          break;
+              }
+      savedStats1 = "nothing";
+    }
+  }
+  else {
+    for (let fish of fishArray){
+      if(fish.isMouseOver()){
+        savedStats2 = 
+        `Speed: ${fish.speed.toFixed(2)}
+          Fin Size: ${fish.finSize.toFixed(2)}
+          Size: ${fish.size.toFixed(2)}
+          Aggression: ${fish.aggression.toFixed(2)}
+          Lifespan: ${fish.lifespan.toFixed(2)}
+          Energy: ${fish.energy.toFixed(1)}
+          Salinity Pref: ${fish.salinityPreference.toFixed(2)}%
+          Tolerance: ±${fish.salinityTolerance.toFixed(2)}%`
+
+        breedFish();
+        break;
+      }
+      savedStats2 = "nothing";
+    }
+  }
+
+}
+
 
 function mousePressed() {
   console.log("Mouse pressed at: ", mouseX, mouseY);
+  saveFishStats();
   mousePressedFeeder();
 }
 
