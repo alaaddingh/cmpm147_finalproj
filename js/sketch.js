@@ -16,6 +16,7 @@ let salinitySlider;//slider for salinity
 let salinityLevel = 50; // default 50% saltwater
 let salinityLabel;
 
+
 /**
  * GLOBAL TANK VARIABLES
  */
@@ -227,9 +228,17 @@ function setup() {
   spawnButton.style('border', 'none');
   spawnButton.style('border-radius', '5px');
   spawnButton.style('cursor', 'pointer');
+
+  almanac = new Almanac();
+  almanac.setup();
 }
 
 function draw() {
+  // Pause the game if the almanac is visible
+  if (almanac.visible) {
+    almanac.display();
+    return; // RN this leaves black square in corner idk why - Leif
+  }
   tickSpeed = tickSlider.value();
   salinityLevel = salinitySlider.value();
   tankbackground();
@@ -259,7 +268,7 @@ function draw() {
     
   sidePanel.display(selectedFish);
 
-
+  almanac.display();
 }
 
 function showFishStats() {//rounded the stats so it doesn't look too cluttered
