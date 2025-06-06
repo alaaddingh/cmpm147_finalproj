@@ -22,6 +22,8 @@ class SidePanel {
             `Speed: ${fish.speed.toFixed(2)}`,
             `Size: ${fish.size.toFixed(2)}`,
             `Aggression: ${fish.aggression.toFixed(2)}`,
+            `Health: ${fish.health.toFixed(1)} / ${fish.maxHealth}`,
+            `Diet: ${fish.diet}`,
             `Lifespan: ${fish.lifespan.toFixed(1)}`,
             `Salinity Pref: ${fish.salinityPreference.toFixed(1)}`,
             `Salinity Tol: ${fish.salinityTolerance.toFixed(1)}`,

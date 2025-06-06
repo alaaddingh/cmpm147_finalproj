@@ -55,6 +55,7 @@ function loadfish() {
       color: color(f.color[0], f.color[1], f.color[2]),
       aggression: f.aggression,
       lifespan: f.lifespan,
+      health: f.health,
       salinityPreference: f.salinityPreference,
       salinityTolerance: f.salinityTolerance
 
@@ -80,6 +81,7 @@ function spawnRandomFishFromJSON() {
     color: color(f.color[0], f.color[1], f.color[2]),
     aggression: f.aggression,
     lifespan: f.lifespan,
+    health: f.health,
     salinityPreference: f.salinityPreference,
     salinityTolerance: f.salinityTolerance
   };
@@ -99,6 +101,7 @@ function spawnFishFromBreeding() {
     color: color(getRandomTraitNumber(min(savedStats1.color[0], savedStats2.color[0]), max(savedStats1.color[0], savedStats2.color[0])), getRandomTraitNumber(min(savedStats1.color[1], savedStats2.color[1]), max(savedStats1.color[1], savedStats2.color[1])), getRandomTraitNumber(min(savedStats1.color[2], savedStats2.color[2]), max(savedStats1.color[2], savedStats2.color[2]))),
     aggression: getRandomTraitNumber(min(savedStats1.aggression, savedStats2.aggression), max(savedStats1.aggression, savedStats2.aggression)),
     lifespan: getRandomTraitNumber(min(savedStats1.lifespan, savedStats2.lifespan), max(savedStats1.lifespan, savedStats2.lifespan)),
+    health: f.health,
     salinityPreference: getRandomTraitNumber(min(savedStats1.salinityPreference, savedStats2.salinityPreference), max(savedStats1.salinityPreference, savedStats2.salinityPreference)),
     salinityTolerance: getRandomTraitNumber(min(savedStats1.salinityTolerance, savedStats2.salinityTolerance), max(savedStats1.salinityTolerance, savedStats2.salinityTolerance)),
   };
@@ -269,6 +272,7 @@ Size: ${fish.size.toFixed(2)}
 Aggression: ${fish.aggression.toFixed(2)}
 Lifespan: ${fish.lifespan.toFixed(2)}
 Energy: ${fish.energy.toFixed(1)}
+Health: ${fish.health.toFixed(2)}
 Diet: ${fish.diet}
 Salinity Pref: ${fish.salinityPreference.toFixed(2)}%
 Tolerance: ±${fish.salinityTolerance.toFixed(2)}%`

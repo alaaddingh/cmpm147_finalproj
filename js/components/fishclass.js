@@ -4,6 +4,7 @@ class Fish {
     this.y = y;
     this.baseY = y; // used for tickspeed
     this.maxEnergy = traits.lifespan; // How long without eating before death
+    this.invincibleTimer = 5; // seconds of invincibility after spawning
     this.speed = traits.speed;
     this.finSize = traits.finSize;
     this.size = traits.size;
@@ -12,6 +13,8 @@ class Fish {
     this.lifespan = traits.lifespan;  
     this.age = 0;
     this.energy = 50; // Used for breeding and lifespan
+    this.health = traits.health || 100; // Default to 100 if not defined
+    this.maxHealth = 100;
     this.alive = true;
     //this.isSaltwater = traits.isSaltwater;
     this.salinityPreference = traits.salinityPreference || 50;
@@ -20,6 +23,7 @@ class Fish {
 
     this.lastBreedTime = -Infinity; // timestamp of last breeding
 
+    // this.attackCooldown = 0; might add this for carnivores since they are eating their children which makes it so they can't reproduce
     this.swimTime = random(TWO_PI);
     // motion properties
     this.setInitialMotion();
@@ -119,18 +123,23 @@ class Fish {
    *  Checks if this fish can eat the other fish
    */
   eatFish(other) {
-    // Can't eat fish of same or larger size unless much more aggressive
-    const sizeRatio = this.size / other.size;
-    const aggressionFactor = this.aggression / other.aggression;
-    
-    if (sizeRatio > 1.5 || (sizeRatio > 1.2 && aggressionFactor > 1.5)) {
-      // Successfully eat the other fish
-      this.energy += other.size * 10; // Gain energy based on prey size
-      other.alive = false; // Set as dead, updateFish.js will handle removal
-    console.log(`${this.diet} fish ate a ${other.diet}`);
-    // console.log(this+" ate "+other);
+    if (this === other || !other.alive) return false;
+
+    // Calculate base damage based on size, aggression, and difference
+    const baseDamage = (this.size * 0.5 + this.aggression * 8) - (other.size * 0.25);
+    const finalDamage = max(baseDamage, 5); // Minimum dmg
+
+    other.health -= finalDamage;
+
+    console.log(`${this.diet} fish attacked ${other.diet}, dealing ${finalDamage.toFixed(1)} damage (HP left: ${other.health.toFixed(1)})`);
+
+    if (other.health <= 0) {
+      other.alive = false;
+      this.energy += other.size * 10; // Reward only on kill
+      console.log(`${this.diet} fish killed and ate ${other.diet}`);
       return true;
     }
+
     return false;
   }
 
@@ -186,6 +195,10 @@ class Fish {
       return;
     }
 
+    if (this.invincibleTimer > 0) {
+        this.invincibleTimer -= tickSpeed / 60; // Assuming 60 FPS base
+    }
+
     this.energy -= 0.1 * tickSpeed;
 
 
@@ -203,15 +216,20 @@ class Fish {
       if (offspring) {
         fishArray.push(offspring);
       // Attempt to eat if breeding didnt work
-      } else if (this.diet === "carnivore" && other.diet !== "plankton" && this.eatFish(other)) {
+      } else if (this.diet === "carnivore" && other.diet !== "plankton" && this.eatFish(other) && other.invincibleTimer <= 0) {
         fishArray.splice(fishArray.indexOf(other), 1);
       }
     }
     this.move();
     this.checkBounds();
 
+    //natural regeneration
+    if (this.energy > 100 && this.health < this.maxHealth) {
+      this.health = min(this.maxHealth, this.health + 5 * (tickSpeed / 60));
+    }
+
     // Random chance of death
-    if (random() < 0.00015) this.alive = false;
+    // if (random() < 0.00015) this.alive = false;
   }
 
  
