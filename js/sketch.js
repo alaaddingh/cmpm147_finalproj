@@ -102,7 +102,7 @@ function spawnFishFromBreeding() {
     color: color(getRandomTraitNumber(min(savedStats1.color[0], savedStats2.color[0]), max(savedStats1.color[0], savedStats2.color[0])), getRandomTraitNumber(min(savedStats1.color[1], savedStats2.color[1]), max(savedStats1.color[1], savedStats2.color[1])), getRandomTraitNumber(min(savedStats1.color[2], savedStats2.color[2]), max(savedStats1.color[2], savedStats2.color[2]))),
     aggression: getRandomTraitNumber(min(savedStats1.aggression, savedStats2.aggression), max(savedStats1.aggression, savedStats2.aggression)),
     lifespan: getRandomTraitNumber(min(savedStats1.lifespan, savedStats2.lifespan), max(savedStats1.lifespan, savedStats2.lifespan)),
-    health: f.health,
+    health: getRandomTraitNumber(min(savedStats1.health, savedStats2.health), max(savedStats1.health, savedStats2.health)),
     salinityPreference: getRandomTraitNumber(min(savedStats1.salinityPreference, savedStats2.salinityPreference), max(savedStats1.salinityPreference, savedStats2.salinityPreference)),
     salinityTolerance: getRandomTraitNumber(min(savedStats1.salinityTolerance, savedStats2.salinityTolerance), max(savedStats1.salinityTolerance, savedStats2.salinityTolerance)),
   };
