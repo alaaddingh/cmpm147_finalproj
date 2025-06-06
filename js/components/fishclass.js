@@ -16,7 +16,8 @@ class Fish {
     //this.isSaltwater = traits.isSaltwater;
     this.salinityPreference = traits.salinityPreference || 50;
     this.salinityTolerance = traits.salinityTolerance || 20;//a fallback value if not provided
-    
+    this.diet = traits.diet || "herbivore";
+
     this.lastBreedTime = -Infinity; // timestamp of last breeding
 
     this.swimTime = random(TWO_PI);
@@ -124,9 +125,10 @@ class Fish {
     
     if (sizeRatio > 1.5 || (sizeRatio > 1.2 && aggressionFactor > 1.5)) {
       // Successfully eat the other fish
-      this.energy += other.size * 5; // Gain energy based on prey size
+      this.energy += other.size * 10; // Gain energy based on prey size
       other.alive = false; // Set as dead, updateFish.js will handle removal
-    //  console.log(this+" ate "+other);
+    console.log(`${this.diet} fish ate a ${other.diet}`);
+    // console.log(this+" ate "+other);
       return true;
     }
     return false;
@@ -201,7 +203,7 @@ class Fish {
       if (offspring) {
         fishArray.push(offspring);
       // Attempt to eat if breeding didnt work
-      } else if (this.eatFish(other)) {
+      } else if (this.diet === "carnivore" && other.diet !== "plankton" && this.eatFish(other)) {
         fishArray.splice(fishArray.indexOf(other), 1);
       }
     }
@@ -223,9 +225,27 @@ class Fish {
   }
 
   // BODY (main ellipse)
+// BODY (main ellipse) with diet outline
+  push();
+  if (this.diet === "carnivore") {
+    stroke(255, 0, 0); // Red outline
+  } else if (this.diet === "herbivore") {
+    stroke(0, 255, 0); // Green outline
+  } else {
+    noStroke(); // No outline
+  }
+  strokeWeight(2);
+  fill(this.color);
+  ellipse(0, 0, this.size, this.size * 0.6);
+  pop();
+
+
+  /*
   fill(this.color);
   noStroke();
   ellipse(0, 0, this.size, this.size * 0.6);
+  */
+
 
   // HEAD (smaller ellipse)
   fill(lerpColor(this.color, color(255), 0.2));

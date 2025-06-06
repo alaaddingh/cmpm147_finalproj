@@ -6,10 +6,10 @@ function updateAndDrawPlankton() {
         plankton.display();
 
         for (let fish of fishArray) {
-            if (plankton.isCollidingWith(fish) && fish.alive) {
+            if (fish.alive && fish.diet === "herbivore" && plankton.isCollidingWith(fish)) {
                 fish.energy = Math.min(fish.energy + plankton.size * energyMult, fish.maxEnergy);
-                planktonArray.splice(i, 1); // Remove plankton
-                break;
+                planktonArray.splice(i, 1);
+                break;  // go to next plankton
             }
         }
     }

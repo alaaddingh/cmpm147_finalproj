@@ -59,6 +59,7 @@ function loadfish() {
       salinityTolerance: f.salinityTolerance
 
     };
+    traits.diet = (i % 2 === 0) ? "herbivore" : "carnivore";
     
     let x = random(TANK.left() + traits.size / 2, TANK.right() - traits.size / 2);
     let y = random(TANK.top() + traits.size / 2, TANK.bottom() - traits.size / 2);
@@ -82,6 +83,8 @@ function spawnRandomFishFromJSON() {
     salinityPreference: f.salinityPreference,
     salinityTolerance: f.salinityTolerance
   };
+
+  traits.diet = random() < 0.5 ? "herbivore" : "carnivore";
 
   let x = random(TANK.left() + traits.size / 2, TANK.right() - traits.size / 2);
   let y = random(TANK.top() + traits.size / 2, TANK.bottom() - traits.size / 2);
@@ -266,6 +269,7 @@ Size: ${fish.size.toFixed(2)}
 Aggression: ${fish.aggression.toFixed(2)}
 Lifespan: ${fish.lifespan.toFixed(2)}
 Energy: ${fish.energy.toFixed(1)}
+Diet: ${fish.diet}
 Salinity Pref: ${fish.salinityPreference.toFixed(2)}%
 Tolerance: ±${fish.salinityTolerance.toFixed(2)}%`
       fill(255, 230);

@@ -42,7 +42,7 @@ function fishArrayCollision(fishArray, newFish) {
         newFish.push(offspring);  // Store in temporary array
         fishArray[i].energy = max(fishArray[i].energy - 45, 0);
         other.energy = max(other.energy - 45, 0);
-      } else {
+      } else if (fishArray[i].diet === "carnivore" && other.diet !== "plankton") {
         fishArray[i].eatFish(other);
       }
     }
