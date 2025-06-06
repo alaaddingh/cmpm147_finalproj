@@ -23,6 +23,9 @@ class Fish {
 
     this.lastBreedTime = -Infinity; // timestamp of last breeding
 
+    this.lastEatTime = -Infinity; // timestamp of last eating
+    this.eatCooldown = 100;
+
     // this.attackCooldown = 0; might add this for carnivores since they are eating their children which makes it so they can't reproduce
     this.swimTime = random(TWO_PI);
     // motion properties
@@ -124,18 +127,25 @@ class Fish {
    */
   eatFish(other) {
     if (this === other || !other.alive) return false;
+    
+    // Check eating cooldown
+    let now = millis();
+    if (now - this.lastEatTime < this.eatCooldown) {
+      return false; // Still on cooldown
+    }
 
     // Calculate base damage based on size, aggression, and difference
     const baseDamage = (this.size * 0.5 + this.aggression * 8) - (other.size * 0.25);
     const finalDamage = max(baseDamage, 5); // Minimum dmg
 
     other.health -= finalDamage;
+    this.lastEatTime = now; // Reset cooldown timer
 
     console.log(`${this.diet} fish attacked ${other.diet}, dealing ${finalDamage.toFixed(1)} damage (HP left: ${other.health.toFixed(1)})`);
 
     if (other.health <= 0) {
       other.alive = false;
-      this.energy += other.size * 10; // Reward only on kill
+      this.energy += other.size * 2; // Reward only on kill
       console.log(`${this.diet} fish killed and ate ${other.diet}`);
       return true;
     }
