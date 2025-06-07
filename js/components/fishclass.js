@@ -39,11 +39,11 @@ class Fish {
   this.originalSpeed = this.speed; 
   this.decisionCooldown = 700; 
   this.lastDecisionTime = millis(); 
-  this.state        = "wander";          // wander | hunt | flee
-  this.stateTimer   = 0;                
+  this.state        = "wander";          // wander, hunt, flee
+  this.stateTimer   = 10;                
   this.target       = null;              // current fish or plankton we’re focussed on
-  this.visionRange  = 500;               // px distance we can “see”
-  this.visionAngle  = PI / 2;            // 45° cone 
+  this.visionRange  = 500;               
+  this.visionAngle  = PI / 2;            
   this.maxStateDur  = { hunt: 3500, flee: 4000 };
 
   
@@ -138,10 +138,14 @@ class Fish {
   }
 
 
-
+ /**
+  * 
+  *  Gets the environment around the fish.
+  *  Returns an object with closest plankton, herbivore, and carnivore.
+  */
 
   getEnvironment(planktonArray, fishArray) {
-  const fwd      = createVector(this.vx, this.vy).normalize();   // heading
+  const fwd      = createVector(this.vx, this.vy).normalize();   
   const inCone   = (x, y) => {
     const toObj   = createVector(x - this.x, y - this.y);
     const dist    = toObj.mag();
@@ -180,9 +184,8 @@ class Fish {
  */
 
 decideAndAct(env) {
-  // ---------------- STATE TRANSITIONS ----------------
   if (this.state === "wander") {
-    this.speed = this.originalSpeed; // reset speed to original
+    this.speed = this.originalSpeed;
     if (this.diet === "herbivore" && env.closestPlankton) {
       this.state    = "hunt";
       this.target   = env.closestPlankton;
@@ -200,11 +203,10 @@ decideAndAct(env) {
     }
   }
 
-  // ---------------- ACTIONS PER STATE ----------------
   const steerToward = (tx, ty, boost = 1) => {
     const a = atan2(ty - this.y, tx - this.x);
     this.vx = cos(a) * this.speed * boost;
-    this.vy = sin(a) * this.speed * 0.4 * boost;  // attenuate vertical for smoother motion
+    this.vy = sin(a) * this.speed * 0.4 * boost;  
   };
 
   switch (this.state) {
