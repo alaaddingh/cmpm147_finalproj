@@ -17,6 +17,7 @@ class SidePanel {
     textSize(16);
     if (fish) {
         let lines = [
+            'State: ' + fish.state,
             `Energy: ${fish.energy.toFixed(1)}`,
             `Age: ${fish.age.toFixed(0)}`,
             `Speed: ${fish.speed.toFixed(2)}`,

@@ -34,20 +34,11 @@ class Fish {
     this.swimAmplitude = random(4, 8);
     this.swimFrequency = random(0.05, 0.1);
 
-  // Variables for state machine
-  // and fish behavior
-  this.originalSpeed = this.speed; 
-  this.decisionCooldown = 700; 
+  // Cooldown for fish to react to environment changes
+  this.decisionCooldown = 3000; 
   this.lastDecisionTime = millis(); 
-  this.state        = "wander";          // wander | hunt | flee
-  this.stateTimer   = 0;                
-  this.target       = null;              // current fish or plankton we’re focussed on
-  this.visionRange  = 500;               // px distance we can “see”
-  this.visionAngle  = PI / 2;            // 45° cone 
-  this.maxStateDur  = { hunt: 3500, flee: 4000 };
-
-  
-  
+  this.state = "idle"; // New: Tracks the fish's current state
+  this.target = null; // New: Tracks the current target (plankton or fish)
   }
 
 
@@ -138,105 +129,61 @@ class Fish {
   }
 
 
-
+    behave(environment) {
+      const { closestPlankton, closestHerbivore, closestCarnivore } = environment;
+      if (this.diet === "herbivore") {
+        if (closestPlankton) {
+          // Swim toward plankton
+          let angle = atan2(closestPlankton.y - this.y, closestPlankton.x - this.x);
+          this.vx = cos(angle) * this.speed * 1.3; // Speed up toward plankton
+          this.vy = sin(angle) * this.speed * 1.3;
+        } else if (closestCarnivore) {
+          // Swim away from carnivore
+          let angle = atan2(this.y - closestCarnivore.y, this.x - closestCarnivore.x);
+          this.vx = cos(angle) * this.speed; // Normal speed away
+          this.vy = sin(angle) * this.speed;
+        }
+      } else if (this.diet === "carnivore") {
+        if (closestHerbivore) {
+          // Swim toward herbivore
+          let angle = atan2(closestHerbivore.y - this.y, closestHerbivore.x - this.x);
+          this.vx = cos(angle) * this.speed * 1.2; // Slight speed boost toward prey
+          this.vy = sin(angle) * this.speed * 1.2;
+        }
+      }
+    }
 
   getEnvironment(planktonArray, fishArray) {
-  const fwd      = createVector(this.vx, this.vy).normalize();   // heading
-  const inCone   = (x, y) => {
-    const toObj   = createVector(x - this.x, y - this.y);
-    const dist    = toObj.mag();
-    if (dist > this.visionRange || dist === 0) return false;
-    const angle   = acos(p5.Vector.dot(fwd, toObj.copy().normalize()));
-    return angle < this.visionAngle * 0.6;   // half-angle on either side
-  };
-
-  let closestPlankton   = null, dPlankton   = Infinity;
-  let closestHerbivore  = null, dHerbivore  = Infinity;
-  let closestCarnivore  = null, dCarnivore  = Infinity;
-
-  for (const p of planktonArray) {
-    const d = dist(this.x, this.y, p.x, p.y);
-    if (d < dPlankton && inCone(p.x, p.y)) { closestPlankton = p; dPlankton = d; }
-  }
-
-  for (const o of fishArray) {
-    if (o === this || !o.alive) continue;
-    const d = dist(this.x, this.y, o.x, o.y);
-    if (!inCone(o.x, o.y)) continue;
-
-    if (o.diet === "herbivore" && d < dHerbivore && o.size < this.size) {
-      closestHerbivore = o; dHerbivore = d;
-    } else if (o.diet === "carnivore" && d < dCarnivore) {
-      closestCarnivore = o; dCarnivore = d;
-    }
-  }
-
-  return { closestPlankton, closestHerbivore, closestCarnivore };
-}
-
-
-/**
- * STATE MACHINE FOR FISH BEHAVIOR
- */
-
-decideAndAct(env) {
-  // ---------------- STATE TRANSITIONS ----------------
-  if (this.state === "wander") {
-    this.speed = this.originalSpeed; // reset speed to original
-    if (this.diet === "herbivore" && env.closestPlankton) {
-      this.state    = "hunt";
-      this.target   = env.closestPlankton;
-      this.stateTimer = this.maxStateDur.hunt;
-    } else if (this.diet === "herbivore" && env.closestCarnivore) {
-      this.state    = "flee";
-      this.target   = env.closestCarnivore;
-      this.speed *= 1.5;
-      this.stateTimer = this.maxStateDur.flee;
-    } else if (this.diet === "carnivore" && env.closestHerbivore) {
-      this.state    = "hunt";
-      this.speed *= 1.1; 
-      this.target   = env.closestHerbivore;
-      this.stateTimer = this.maxStateDur.hunt;
-    }
-  }
-
-  // ---------------- ACTIONS PER STATE ----------------
-  const steerToward = (tx, ty, boost = 1) => {
-    const a = atan2(ty - this.y, tx - this.x);
-    this.vx = cos(a) * this.speed * boost;
-    this.vy = sin(a) * this.speed * 0.4 * boost;  // attenuate vertical for smoother motion
-  };
-
-  switch (this.state) {
-    case "hunt":
-      if (!this.target || !this.target.alive || this.stateTimer <= 0) {
-        this.state = "wander";
-        this.target = null;
-      } else {
-        steerToward(this.target.x, this.target.y, 1.3);
-        this.stateTimer -= deltaTime;
+    let closestPlankton = null;
+    let closestHerbivore = null;
+    let closestCarnivore = null;
+    let closestPlanktonDistance = Infinity;
+    let closestHerbivoreDistance = Infinity;
+    let closestCarnivoreDistance = Infinity;
+    // Detect plankton
+    for (let plankton of planktonArray) {
+      let distance = dist(this.x, this.y, plankton.x, plankton.y);
+      if (distance < 200 && distance < closestPlanktonDistance) {
+        closestPlankton = plankton;
+        closestPlanktonDistance = distance;
       }
-      break;
+    }
+    // Detect other fish
+    for (let other of fishArray) {
+      if (other === this || !other.alive) continue;
+      let distance = dist(this.x, this.y, other.x, other.y);
 
-    case "flee":
-      if (!this.target || !this.target.alive || this.stateTimer <= 0) {
-        this.state = "wander";
-        this.target = null;
-      } else {
-        steerToward(
-          this.x - (this.target.x - this.x),
-          this.y - (this.target.y - this.y),
-          1.2
-        );
-        this.stateTimer -= deltaTime;
+      if ((other.diet === "herbivore" || other.size < this.size) && distance < 200 && distance < closestHerbivoreDistance) {
+        closestHerbivore = other;
+        closestHerbivoreDistance = distance;
+      } else if ((other.diet === "carnivore" || other.size > this.size) && distance < 200 && distance < closestCarnivoreDistance) {
+        closestCarnivore = other;
+        closestCarnivoreDistance = distance;
       }
-      break;
+    }
 
-    default: 
-      break;
+    return { closestPlankton, closestHerbivore, closestCarnivore };
   }
-}
-
   /**
    *  Checks if this fish can eat the other fish
    */
@@ -333,14 +280,14 @@ decideAndAct(env) {
       this.energy -= penalty * tickSpeed;
     }// fish loses energy if salinity is outside its tolerance range
 
+    // Get fish's surroundings then behave accordingly
    // Decision-making cooldown
-  // BEFORE any collision / movement code:
-if (millis() - this.lastDecisionTime > this.decisionCooldown) {
-  const env = this.getEnvironment(planktonArray, fishArray);
-  this.decideAndAct(env);
-  this.lastDecisionTime = millis();
-}
-
+  if (millis() - this.lastDecisionTime > this.decisionCooldown) {
+  // Get fish's surroundings then behave accordingly
+    const environment = this.getEnvironment(planktonArray, fishArray);
+    this.behave(environment);
+    this.lastDecisionTime = millis(); // Reset cooldown timer
+  }
     // Collision Check
     let other = this.checkCollision(fishArray);
     if (other) {
