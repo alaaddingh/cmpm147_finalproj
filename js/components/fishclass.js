@@ -2,6 +2,7 @@ class Fish {
   constructor(x, y, traits = {}) {
     this.x = x;
     this.y = y;
+    this.name = traits.name || "Unnamed"; // Default name if not provided
     this.baseY = y; // used for tickspeed
     this.maxEnergy = traits.lifespan; // How long without eating before death
     this.invincibleTimer = 5; // seconds of invincibility after spawning
@@ -300,7 +301,10 @@ decideAndAct(env) {
         lifespan: (this.lifespan + other.lifespan) / 2 * random(0.9, 1.1),
         // isSaltwater: this.isSaltwater
         salinityPreference: (this.salinityPreference + other.salinityPreference) / 2 + random(-5, 5),
-        salinityTolerance: (this.salinityTolerance + other.salinityTolerance) / 2 + random(-5, 5)
+        salinityTolerance: (this.salinityTolerance + other.salinityTolerance) / 2 + random(-5, 5),
+        name: random(fishnames),
+
+
 
       };
       

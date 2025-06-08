@@ -7,6 +7,8 @@ let planktonTimer = 0;
 let fishData;
 let fishArray = [];
 let planktonArray = [];
+let fishnames = [];
+let fishNamesData;
 let tickSlider;
 let tickSpeed = 1;
 let tickLabel; // For the slider label
@@ -15,6 +17,14 @@ let sidePanel; //sidepanel stuff
 let salinitySlider;//slider for salinity
 let salinityLevel = 50; // default 50% saltwater
 let salinityLabel;
+
+
+// async call to load json data for fish names
+function loadJSONAsync(path) {
+  return new Promise((resolve, reject) => {
+    loadJSON(path, resolve, reject);
+  });
+}
 
 
 /**
@@ -58,7 +68,8 @@ function loadfish() {
       lifespan: f.lifespan,
       health: f.health,
       salinityPreference: f.salinityPreference,
-      salinityTolerance: f.salinityTolerance
+      salinityTolerance: f.salinityTolerance,
+      name: random(fishnames),
 
     };
     traits.diet = (i % 2 === 0) ? "herbivore" : "carnivore";
@@ -84,7 +95,8 @@ function spawnRandomFishFromJSON() {
     lifespan: f.lifespan,
     health: f.health,
     salinityPreference: f.salinityPreference,
-    salinityTolerance: f.salinityTolerance
+    salinityTolerance: f.salinityTolerance,
+    name: random(fishnames),
   };
 
   traits.diet = random() < 0.5 ? "herbivore" : "carnivore";
@@ -105,6 +117,8 @@ function spawnFishFromBreeding() {
     health: getRandomTraitNumber(min(savedStats1.health, savedStats2.health), max(savedStats1.health, savedStats2.health)),
     salinityPreference: getRandomTraitNumber(min(savedStats1.salinityPreference, savedStats2.salinityPreference), max(savedStats1.salinityPreference, savedStats2.salinityPreference)),
     salinityTolerance: getRandomTraitNumber(min(savedStats1.salinityTolerance, savedStats2.salinityTolerance), max(savedStats1.salinityTolerance, savedStats2.salinityTolerance)),
+    name: random(fishnames),
+    diet: random() < 0.5 ? "herbivore" : "carnivore"
   };
 
   console.log("Breeding new fish with");
@@ -152,8 +166,11 @@ function generateInitialPlankton(count) {
 function preload() {
   img = loadImage('./assets/melvins_fishtank.png'); 
   fishData = loadJSON('./assets/fish.json');
+    const nameFile = loadJSON("./assets/fishnames.json");
+    fishnames = nameFile.names;
+  
+ 
   preloadFeeder();
-  console.log(fishData);
 }
 
 /**
@@ -166,8 +183,15 @@ function displayfishcount() {
   text('Fish Count: ' + fishArray.length, 10, 10);
 }
 
-function setup() {
+async function setupnames() {
+  fishNamesData = await loadJSONAsync('./assets/fishnames.json');
+  fishnames = fishNamesData.names;
+  console.log("Fish names loaded:", fishnames);
+
+}
+async function setup() {
   background(100);
+
   let cnvScale = 0.8;
   let cWidth = windowWidth * cnvScale;
   let cHeight = windowHeight * cnvScale;
@@ -180,7 +204,15 @@ function setup() {
   cnv = createCanvas(cWidth, cHeight);
   cnv.position(xPos, yPos);
   imageMode(CENTER);
+  fishNamesData = await loadJSONAsync('./assets/fishnames.json');
+  fishnames = fishNamesData.names;
+  console.log("Fish names loaded:", fishnames);
+
+  // THEN load fish using the now-loaded fishnames
   loadfish();
+  setupnames();
+
+
   generateRandomFish(10);
   console.log(fishArray);
   generateInitialPlankton(initialPlanktonCount);
@@ -245,7 +277,7 @@ function draw() {
 
   updateAndDrawFish();
   updateAndDrawPlankton();
-  showFishStats();
+  showFishName();
   if (millis() - planktonTimer >= planktonCooldown/tickSpeed) {
     planktonTimer = millis();
     generatePlaknton();
@@ -272,20 +304,11 @@ function draw() {
   almanac.update();
 }
 
-function showFishStats() {//rounded the stats so it doesn't look too cluttered
+function showFishName() {//rounded the stats so it doesn't look too cluttered
   for (let fish of fishArray) {
     if (fish.isMouseOver()) {
       let stats = 
-       `Speed: ${fish.speed.toFixed(2)}
-Fin Size: ${fish.finSize.toFixed(2)}
-Size: ${fish.size.toFixed(2)}
-Aggression: ${fish.aggression.toFixed(2)}
-Lifespan: ${fish.lifespan.toFixed(2)}
-Energy: ${fish.energy.toFixed(1)}
-Health: ${fish.health.toFixed(2)}
-Diet: ${fish.diet}
-Salinity Pref: ${fish.salinityPreference.toFixed(2)}%
-Tolerance: ±${fish.salinityTolerance.toFixed(2)}%`
+       `Name: ${fish.name}\n`
       fill(255, 230);
       stroke(0);
       strokeWeight(2);
@@ -314,10 +337,13 @@ function generateRandomFish(count) {
         random(50, 255),
         random(50, 255)
       ),
+    
       aggression: random(0, 1),     // 0-1 scale
       lifespan: Math.floor(random(80, 250)), // Frames of lifespan
       salinityPreference: random() > 0.5 ? 80 : 10,
-      salinityTolerance: random(10, 30)
+      salinityTolerance: random(10, 30),
+      name: random(fishnames),
+
     };
 
     // Make sure it fits in the tank
@@ -353,7 +379,8 @@ function saveFishStats() {
           lifespan: fish.lifespan,
           energy: fish.energy,
           salinityPreference: fish.salinityPreference,
-          salinityTolerance: fish.salinityTolerance
+          salinityTolerance: fish.salinityTolerance,
+          name : fish.name
         }
           break;
               }
@@ -372,7 +399,8 @@ function saveFishStats() {
           lifespan: fish.lifespan,
           energy: fish.energy,
           salinityPreference: fish.salinityPreference,
-          salinityTolerance: fish.salinityTolerance
+          salinityTolerance: fish.salinityTolerance,
+          name: fish.name
       }
         breedFish();
         break;

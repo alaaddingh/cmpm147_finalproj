@@ -140,12 +140,13 @@ class Almanac {
         textSize(this.bodyFontSize);
         let statsY = y - this.entryHeight/2 + this.padding;
         let stats = [
-            `Age: ${floor(fish.age)}`,
+            'Name: ' + fish.name,
+            `Age: ${floor(fish.age / 10)}` ,
             `Energy: ${floor(fish.energy)}`,
             `Health: ${floor(fish.health)}`,
             `Speed: ${fish.speed.toFixed(1)}`,
             `Size: ${fish.size.toFixed(1)}`,
-            `Aggression: ${fish.aggression.toFixed(1)}`,
+            `Aggression: ${fish.aggression.toFixed(1) * 100} %`,
             `Diet: ${fish.diet}`,
             `Salinity: ${fish.salinityPreference.toFixed(0)}% ±${fish.salinityTolerance.toFixed(0)}`
         ];
