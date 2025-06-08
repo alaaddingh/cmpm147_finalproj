@@ -12,27 +12,56 @@ class Almanac {
         this.entryHeight = 180;
         this.lastPageChange = 0; // Timestamp of last page change
         this.pageChangeCooldown = 300; // 300ms cooldown between page changes
+        this.buttonX = 20;
+        this.buttonY = 400;
+        this.buttonBaseSize = 400;
+        this.buttonHoverSize = 450;
+        this.buttonCurrentSize = this.buttonBaseSize;
+    }
+     preload() {
+    almanacButtonImage = loadImage('assets/fishalmanac.png');
     }
   
     setup() {
-        this.button = createButton('Fish Almanac');
-        this.button.position(15, 400);
-        this.button.mousePressed(() => this.toggle());
-        this.button.style('font-size', '14px');
-        this.button.style('padding', '6px 12px');
-        this.button.style('background-color', '#55aaff');
-        this.button.style('color', 'white');
-        this.button.style('border', 'none');
-        this.button.style('border-radius', '5px');
-        this.button.style('cursor', 'pointer');
+    this.button = createImg('assets/fishalmanac.png', 'Open Almanac');
+    this.button.position(this.buttonX, this.buttonY);
+    this.button.size(this.buttonBaseSize, this.buttonBaseSize);
+    this.button.mousePressed(() => this.toggle());
+    this.button.style('cursor', 'pointer');
     }
+
   
     toggle() {
         this.visible = !this.visible;
         this.page = 0; // Reset to first page when opening
         this.lastPageChange = millis(); // Reset cooldown when opening
     }
-  
+   update() {
+    let targetSize = this.buttonBaseSize;
+    let overButton = false;
+
+    // Check if mouse is over the button based on current size
+    let centerX = this.buttonX + this.buttonBaseSize / 2;
+    let centerY = this.buttonY + this.buttonBaseSize / 2;
+    let halfSize = this.buttonCurrentSize / 2;
+
+    if (mouseX >= centerX - halfSize && mouseX <= centerX + halfSize &&
+        mouseY >= centerY - halfSize && mouseY <= centerY + halfSize) {
+        targetSize = this.buttonHoverSize;
+        overButton = true;
+    }
+
+    // Smooth growth
+    this.buttonCurrentSize = lerp(this.buttonCurrentSize, targetSize, 0.1);
+
+    // Update size and reposition so it stays centered
+    let newX = centerX - this.buttonCurrentSize / 2;
+    let newY = centerY - this.buttonCurrentSize / 2;
+
+    this.button.size(this.buttonCurrentSize, this.buttonCurrentSize);
+    this.button.position(newX, newY);
+}
+
     display() {
         if (!this.visible || fishArray.length === 0) return;
 

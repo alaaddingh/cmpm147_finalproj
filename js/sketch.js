@@ -269,6 +269,7 @@ function draw() {
   sidePanel.display(selectedFish);
 
   almanac.display();
+  almanac.update();
 }
 
 function showFishStats() {//rounded the stats so it doesn't look too cluttered
