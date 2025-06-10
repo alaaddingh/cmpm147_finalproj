@@ -280,25 +280,35 @@ decideAndAct(env) {
      *  Checks if this fish can breed with the other fish
      */
     breed(other) {
-      
+      // Current time in milliseconds
       let now = millis();
-      let breedCooldown = 3000; // 3 seconds cooldown to stop exponential breeding
-      // Check breeding compatibility
-      const salinityDiff = Math.abs(this.salinityPreference - other.salinityPreference);
-      const toleranceRange = Math.min(this.salinityTolerance, other.salinityTolerance);
-
-      if (salinityDiff > toleranceRange || 
-      this.energy < 5 || other.energy < 5 || 
-      this.age < 100 || other.age < 100 || 
-      now - this.lastBreedTime < breedCooldown || 
-      now - other.lastBreedTime < breedCooldown) {
-    return null;
-  }
-
       
+      // Breeding cooldown (3 seconds)
+      let breedCooldown = 3000;
+      
+      // Check all breeding conditions
+      if (
+        // Check if either fish is on cooldown
+        (now - this.lastBreedTime < breedCooldown) ||
+        (now - other.lastBreedTime < breedCooldown) ||
+        
+        // Check if either fish is too young (age in frames)
+        (this.age < 100) ||
+        (other.age < 100) ||
+        
+        // Check if either fish has insufficient energy
+        (this.energy < 30) ||
+        (other.energy < 30) ||
+        
+        // Check salinity compatibility
+        (Math.abs(this.salinityPreference - other.salinityPreference) > 
+         Math.min(this.salinityTolerance, other.salinityTolerance))) {
+        
+        return null; // Breeding conditions not met
+      }
+    
       // Genetic recombination with mutation
-      let rand = seededRandom; // Use the seeded random
-  
+      let rand = seededRandom; // Use seeded random for consistency
       let newTraits = {
         speed: (this.speed + other.speed) / 2 * (0.9 + 0.2 * rand()),
         size: (this.size + other.size) / 2 * (0.9 + 0.2 * rand()),
@@ -310,7 +320,16 @@ decideAndAct(env) {
         salinityTolerance: (this.salinityTolerance + other.salinityTolerance) / 2 + (-5 + 10 * rand()),
         name: fishnames[floor(rand() * fishnames.length)],
         diet: (this.diet === other.diet) ? this.diet : (rand() < 0.5 ? this.diet : other.diet),
+        health: 100
       };
+    
+      // Set breeding cooldowns
+      this.lastBreedTime = now;
+      other.lastBreedTime = now;
+      
+      // Reduce energy from breeding
+      this.energy -= 30;
+      other.energy -= 30;
     
       return new Fish(
         (this.x + other.x) / 2,
