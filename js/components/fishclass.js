@@ -13,7 +13,7 @@ class Fish {
     this.aggression = traits.aggression;
     this.lifespan = traits.lifespan;  
     this.age = 0;
-    this.energy = 50; // Used for breeding and lifespan
+    this.energy = 100; // Used for breeding and lifespan
     this.health = traits.health || 100; // Default to 100 if not defined
     this.maxHealth = 100;
     this.alive = true;
@@ -79,7 +79,7 @@ class Fish {
    * maybe energy < 30%, fish moves slower?
    */
   isAlive() {
-    if (this.energy <= 0) {
+    if (this.energy <= 0 || this.health <= 0 ) {
       this.alive = false;
     } else {
       this.age += tickSpeed;
@@ -244,8 +244,12 @@ decideAndAct(env) {
    *  Checks if this fish can eat the other fish
    */
   eatFish(other) {
-    if (this === other || !other.alive) return false;
+    if (this === other || !other.alive || this.attackCooldown > 0) return false;
     
+
+    if (other.invincibleTimer > 0) {
+      return false;
+    }
     // Check eating cooldown
     let now = millis();
     if (now - this.lastEatTime < this.eatCooldown) {
@@ -263,7 +267,7 @@ decideAndAct(env) {
 
     if (other.health <= 0) {
       other.alive = false;
-      this.energy += other.size * 2; // Reward only on kill
+      this.energy += other.size * 5; // Reward only on kill
       console.log(`${this.diet} fish killed and ate ${other.diet}`);
       return true;
     }
@@ -303,6 +307,7 @@ decideAndAct(env) {
         salinityPreference: (this.salinityPreference + other.salinityPreference) / 2 + random(-5, 5),
         salinityTolerance: (this.salinityTolerance + other.salinityTolerance) / 2 + random(-5, 5),
         name: random(fishnames),
+        diet: (this.diet === other.diet) ? this.diet : (random() < 0.5 ? this.diet : other.diet),
 
 
 
@@ -326,19 +331,32 @@ decideAndAct(env) {
       return;
     }
 
+    // if (this.health <= 0) {
+    //   this.alive = false;
+    //   return;
+    // }
+
     if (this.invincibleTimer > 0) {
         this.invincibleTimer -= tickSpeed / 60; // Assuming 60 FPS base
     }
 
-    this.energy -= 0.1 * tickSpeed;
+    //speed increases energy consumption
+    const speedFactor = this.speed || 1;
+    const sizeFactor = this.size || 1;
+    this.energy -= 0.001 * speedFactor * sizeFactor * tickSpeed;
 
-
+    // fish loses health if salinity is outside its tolerance range
     const deviation = Math.abs(salinityLevel - this.salinityPreference);
     if (deviation > this.salinityTolerance) {
-      const penalty = (deviation - this.salinityTolerance) * 0.005;
-      this.energy -= penalty * tickSpeed;
-    }// fish loses energy if salinity is outside its tolerance range
+      const overTolerance = deviation - this.salinityTolerance;
 
+      // Quadratic penalty: further away = much more damage
+      const penalty = Math.pow(overTolerance, 2) * 0.001; // 
+
+      this.health -= penalty * tickSpeed;
+      
+
+    }
    // Decision-making cooldown
   // BEFORE any collision / movement code:
 if (millis() - this.lastDecisionTime > this.decisionCooldown) {
@@ -364,11 +382,9 @@ if (millis() - this.lastDecisionTime > this.decisionCooldown) {
 
     //natural regeneration
     if (this.energy > 100 && this.health < this.maxHealth) {
-      this.health = min(this.maxHealth, this.health + 5 * (tickSpeed / 60));
+      this.health = min(this.maxHealth, this.health + 10 * (tickSpeed / 60));
     }
 
-    // Random chance of death
-    // if (random() < 0.00015) this.alive = false;
   }
 
  

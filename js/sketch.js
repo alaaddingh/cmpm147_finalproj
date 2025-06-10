@@ -116,9 +116,10 @@ function spawnFishFromBreeding() {
     lifespan: getRandomTraitNumber(min(savedStats1.lifespan, savedStats2.lifespan), max(savedStats1.lifespan, savedStats2.lifespan)),
     health: getRandomTraitNumber(min(savedStats1.health, savedStats2.health), max(savedStats1.health, savedStats2.health)),
     salinityPreference: getRandomTraitNumber(min(savedStats1.salinityPreference, savedStats2.salinityPreference), max(savedStats1.salinityPreference, savedStats2.salinityPreference)),
-    salinityTolerance: getRandomTraitNumber(min(savedStats1.salinityTolerance, savedStats2.salinityTolerance), max(savedStats1.salinityTolerance, savedStats2.salinityTolerance)),
+    salinityTolerance: (savedStats1.salinityTolerance + savedStats2.salinityTolerance) / 2,
+
     name: random(fishnames),
-    diet: random() < 0.5 ? "herbivore" : "carnivore"
+    diet: (savedStats1.diet === savedStats2.diet) ? savedStats1.diet : (random() < 0.5 ? savedStats1.diet : savedStats2.diet)
   };
 
   console.log("Breeding new fish with");
