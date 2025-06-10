@@ -57,9 +57,9 @@ class Fish {
    * Sets the initial motion of the fish in a random direction, 
    * biases left or right for more natural swimming behavior.
    */
-  setInitialMotion() {
-    let angle = random(-PI / 4, PI / 4);
-    if (random() < 0.5) angle += PI;
+  setInitialMotion(rand = Math.random) {
+    let angle = -PI/4 + (PI/2) * rand();
+    if (rand() < 0.5) angle += PI;
     this.vx = cos(angle) * this.speed;
     this.vy = sin(angle) * this.speed * 0.3;
   }
@@ -297,33 +297,26 @@ decideAndAct(env) {
 
       
       // Genetic recombination with mutation
+      let rand = seededRandom; // Use the seeded random
+  
       let newTraits = {
-        speed: (this.speed + other.speed) / 2 * random(0.9, 1.1),
-        size: (this.size + other.size) / 2 * random(0.9, 1.1),
-        finSize: (this.finSize + other.finSize) / 2 * random(0.9, 1.1),
-        color: lerpColor(color(this.color), color(other.color), random(0.3, 0.7)),
-        aggression: (this.aggression + other.aggression) / 2 * random(0.9, 1.1),
-        lifespan: (this.lifespan + other.lifespan) / 2 * random(0.9, 1.1),
-        // isSaltwater: this.isSaltwater
-        salinityPreference: (this.salinityPreference + other.salinityPreference) / 2 + random(-5, 5),
-        salinityTolerance: (this.salinityTolerance + other.salinityTolerance) / 2 + random(-5, 5),
-        name: random(fishnames),
-        diet: (this.diet === other.diet) ? this.diet : (random() < 0.5 ? this.diet : other.diet),
-
-
-
+        speed: (this.speed + other.speed) / 2 * (0.9 + 0.2 * rand()),
+        size: (this.size + other.size) / 2 * (0.9 + 0.2 * rand()),
+        finSize: (this.finSize + other.finSize) / 2 * (0.9 + 0.2 * rand()),
+        color: lerpColor(color(this.color), color(other.color), 0.3 + 0.4 * rand()),
+        aggression: (this.aggression + other.aggression) / 2 * (0.9 + 0.2 * rand()),
+        lifespan: (this.lifespan + other.lifespan) / 2 * (0.9 + 0.2 * rand()),
+        salinityPreference: (this.salinityPreference + other.salinityPreference) / 2 + (-5 + 10 * rand()),
+        salinityTolerance: (this.salinityTolerance + other.salinityTolerance) / 2 + (-5 + 10 * rand()),
+        name: fishnames[floor(rand() * fishnames.length)],
+        diet: (this.diet === other.diet) ? this.diet : (rand() < 0.5 ? this.diet : other.diet),
       };
-      
-     // console.log(self+" bred with "+other);
-      // Position offspring between parents
-
-      this.lastBreedTime = now;
-      other.lastBreedTime = now;
+    
       return new Fish(
         (this.x + other.x) / 2,
         (this.y + other.y) / 2,
         newTraits,
-        (a, b) => (seededRandom() * (b - a) + a)
+        rand
       );
     }
 

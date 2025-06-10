@@ -83,7 +83,8 @@ function loadfish() {
 function spawnRandomFishFromJSON() {
   if (!fishData || fishData.length === 0) return;
 
-  const randomIndex = floor(random(fishData.length));
+  const rand = seededRandom;
+  const randomIndex = floor(rand() * fishData.length);
   const f = fishData[randomIndex];
 
   let traits = {
@@ -96,14 +97,15 @@ function spawnRandomFishFromJSON() {
     health: f.health,
     salinityPreference: f.salinityPreference,
     salinityTolerance: f.salinityTolerance,
-    name: random(fishnames),
+    name: fishnames[floor(rand() * fishnames.length)],
   };
 
-  traits.diet = random() < 0.5 ? "herbivore" : "carnivore";
+  traits.diet = rand() < 0.5 ? "herbivore" : "carnivore";
 
-  let x = random(TANK.left() + traits.size / 2, TANK.right() - traits.size / 2);
-  let y = random(TANK.top() + traits.size / 2, TANK.bottom() - traits.size / 2);
-  let fish = new Fish(x, y, traits, useSeededRandom ? seededRandom : Math.random);
+  let x = lerp(TANK.left() + traits.size/2, TANK.right() - traits.size/2, rand());
+  let y = lerp(TANK.top() + traits.size/2, TANK.bottom() - traits.size/2, rand());
+  
+  let fish = new Fish(x, y, traits, rand);
   fishArray.push(fish);
 }
 
@@ -319,7 +321,7 @@ function draw() {
   // Pause the game if the almanac is visible
   if (almanac.visible) {
     almanac.display();
-    return; // RN this leaves black square in corner idk why - Leif
+    return;
   }
   tickSpeed = tickSlider.value();
   salinityLevel = salinitySlider.value();
