@@ -1,5 +1,5 @@
 class Fish {
-  constructor(x, y, traits = {}) {
+  constructor(x, y, traits = {}, rand = Math.random) {
     this.x = x;
     this.y = y;
     this.name = traits.name || "Unnamed"; // Default name if not provided
@@ -30,10 +30,11 @@ class Fish {
     // this.attackCooldown = 0; might add this for carnivores since they are eating their children which makes it so they can't reproduce
     this.swimTime = random(TWO_PI);
     // motion properties
-    this.setInitialMotion();
-    this.swimOffset = random(TWO_PI);
-    this.swimAmplitude = random(4, 8);
-    this.swimFrequency = random(0.05, 0.1);
+    this.swimOffset = rand() * TWO_PI;
+    this.swimAmplitude = 4 + 4 * rand();
+    this.swimFrequency = 0.05 + 0.05 * rand();
+    
+    this.setInitialMotion(rand);
 
   // Variables for state machine
   // and fish behavior
@@ -321,7 +322,8 @@ decideAndAct(env) {
       return new Fish(
         (this.x + other.x) / 2,
         (this.y + other.y) / 2,
-        newTraits
+        newTraits,
+        (a, b) => (seededRandom() * (b - a) + a)
       );
     }
 

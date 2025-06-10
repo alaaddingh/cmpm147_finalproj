@@ -1,11 +1,11 @@
 class Plankton {
 
-    constructor(x, y, properties = {}) {
+    constructor(x, y, properties = {}, rand = Math.random) {
         this.x = x;
         this.y = y;
         this.size = properties.size;
         this.speed = properties.speed;
-        this.setInitialMotion(); 
+        this.setInitialMotion(rand); 
     }
 
 

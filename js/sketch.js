@@ -103,7 +103,29 @@ function spawnRandomFishFromJSON() {
 
   let x = random(TANK.left() + traits.size / 2, TANK.right() - traits.size / 2);
   let y = random(TANK.top() + traits.size / 2, TANK.bottom() - traits.size / 2);
-  fishArray.push(new Fish(x, y, traits));
+  let fish = new Fish(x, y, traits, useSeededRandom ? seededRandom : Math.random);
+  fishArray.push(fish);
+}
+
+let seed = "fishtank";
+let seededRandom;
+
+function seededRandomGenerator(s) {
+  // Simple hash function to convert string to number
+  let hash = 0;
+  for (let i = 0; i < s.length; i++) {
+    hash = (hash << 5) - hash + s.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
+  
+  // Simple seeded random generator (Mulberry32 algorithm)
+  return function() {
+    hash |= 0;
+    hash = hash + 0x6D2B79F5 | 0;
+    let t = Math.imul(hash ^ hash >>> 15, 1 | hash);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
 }
 
 function spawnFishFromBreeding() {
@@ -155,15 +177,18 @@ function generatePlaknton() {
         planktonArray.push(new Plankton(x, y, { size: size, speed: speed }));
 }
 
-function generateInitialPlankton(count) {
+function generateInitialPlankton(count, useSeededRandom = false) {
+  const rand = useSeededRandom ? seededRandom : Math.random;
+  
   while (planktonArray.length < count) {
-    let size = random(3, 6);
-    let speed = random(0.5, 1.5); 
-    let x = random(TANK.left() + size / 2, TANK.right() - size / 2);
-    let y = random(TANK.top() + size / 2, TANK.bottom() - size / 2);
+    let size = lerp(3, 6, rand());
+    let speed = lerp(0.5, 1.5, rand()); 
+    let x = lerp(TANK.left() + size / 2, TANK.right() - size / 2, rand());
+    let y = lerp(TANK.top() + size / 2, TANK.bottom() - size / 2, rand());
     planktonArray.push(new Plankton(x, y, { size: size, speed: speed }));
+  }
 }
-}
+
 function preload() {
   img = loadImage('./assets/melvins_fishtank.png'); 
   fishData = loadJSON('./assets/fish.json');
@@ -200,7 +225,8 @@ async function setup() {
   let xPos = (windowWidth - cWidth) / 2;
   let yPos = 80; 
 
-
+  // Initialize seeded random
+  seededRandom = seededRandomGenerator(seed);
 
   cnv = createCanvas(cWidth, cHeight);
   cnv.position(xPos, yPos);
@@ -214,7 +240,7 @@ async function setup() {
   setupnames();
 
 
-  generateRandomFish(10);
+  generateRandomFish(10, true);
   console.log(fishArray);
   generateInitialPlankton(initialPlanktonCount);
   setupFeeder();
@@ -261,6 +287,29 @@ async function setup() {
   spawnButton.style('border', 'none');
   spawnButton.style('border-radius', '5px');
   spawnButton.style('cursor', 'pointer');
+
+  let seedInput = createInput(seed);
+  seedInput.position(15, 150);
+  seedInput.style('width', '200px');
+  seedInput.input(() => {
+    seed = seedInput.value();
+  });
+  
+  let seedLabel = createDiv('Seed:');
+  seedLabel.position(15, 130);
+  seedLabel.style('color', '#000');
+  seedLabel.style('font-size', '16px');
+  
+  // Add regenerate button
+  let regenButton = createButton('Regenerate with Seed');
+  regenButton.position(15, 180);
+  regenButton.mousePressed(() => {
+    fishArray = [];
+    planktonArray = [];
+    seededRandom = seededRandomGenerator(seed);
+    generateRandomFish(10, true);
+    generateInitialPlankton(initialPlanktonCount, true);
+  });
 
   almanac = new Almanac();
   almanac.setup();
@@ -327,38 +376,47 @@ function showFishName() {//rounded the stats so it doesn't look too cluttered
 /**
  * Generates COUNT number of random fish with varied traits
  */
-function generateRandomFish(count) {
+function generateRandomFish(count, useSeededRandom = false) {
   for (let i = 0; i < count; i++) {
-    let traits = {
-      speed: random(0.5, 3),        // Slower to faster swimmers
-      finSize: Math.floor(random(5, 25)),       // Small to large fins
-      size: Math.floor(random(15, 50)),         // Small to medium fish
-      color: color(
-        random(50, 255),
-        random(50, 255),
-        random(50, 255)
-      ),
+    const rand = useSeededRandom ? seededRandom : Math.random;
     
-      aggression: random(0, 1),     // 0-1 scale
-      lifespan: Math.floor(random(80, 250)), // Frames of lifespan
-      salinityPreference: random() > 0.5 ? 80 : 10,
-      salinityTolerance: random(10, 30),
-      name: random(fishnames),
-
+    let traits = {
+      speed: lerp(0.5, 3, rand()), 
+      finSize: lerp(5, 25, rand()),
+      size: lerp(15, 50, rand()),
+      color: color(
+        lerp(50, 255, rand()),
+        lerp(50, 255, rand()),
+        lerp(50, 255, rand())
+      ),
+      aggression: rand(),
+      lifespan: lerp(80, 250, rand()),
+      salinityPreference: rand() > 0.5 ? 80 : 10,
+      salinityTolerance: lerp(10, 30, rand()),
+      name: fishnames[floor(rand() * fishnames.length)],
     };
 
-    // Make sure it fits in the tank
-    let x = random(
+    // Position using seeded random
+    let x = lerp(
       TANK.left() + traits.size/2, 
-      TANK.right() - traits.size/2
+      TANK.right() - traits.size/2,
+      rand()
     );
-    let y = random(
+    let y = lerp(
       TANK.top() + traits.size/2, 
-      TANK.bottom() - traits.size/2
+      TANK.bottom() - traits.size/2,
+      rand()
     );
 
-    fishArray.push(new Fish(x, y, traits));
+    let fish = new Fish(x, y, traits);
+    fish.setInitialMotion(rand); // Set initial motion with seeded random
+    fishArray.push(fish);
   }
+}
+
+// Helper function for linear interpolation
+function lerp(min, max, t) {
+  return min + (max - min) * t;
 }
 
 function breedFish(){
