@@ -1,64 +1,267 @@
 body {
-  background: #E3AAC9;
+  background: linear-gradient(135deg, #E3AAC9 0%, #f9c5d1 100%);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+    background: #E3AAC9;
 }
+  
+
+
+/* === Wrapper for Side Panel === */
+.panel-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 320px;
+  transform: translateX(0); /* default visible */
+  transition: transform 0.4s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-wrapper.collapsed {
+  transform: translateX(-100%); /* hidden */
+}
+
+
+/* === Hamburger Button === */
+
+.panel-toggle:hover {
+  background-color: #eecfa4;
+}
+
+
+
+.side-panel-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 999;
+}
+
+
+/* Default state */
+.panel-toggle {
+  position: absolute;
+  left: 5px;
+  transform: translateX(100%);
+  background: #deb887;
+  color: #5c3200;
+  border: 2px solid #7c4a03;
+  border-radius: 0 8px 8px 0;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 600px 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  z-index: 1001;
+}
+
+/* When panel expands, push button to the right */
+.panel-wrapper.expanded ~ .panel-toggle {
+  transform: translateX(350px);
+  
+}
+
+
+
+
+
+/* === Control Panel Inside Wrapper === */
+.control-panel {
+  width: 100%;
+  padding: 24px;
+  background: rgba(255, 248, 240, 0.95);
+  border-right: 2px solid #deb887;
+  box-shadow: 8px 0 24px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6px);
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Labels */
+.slider-label,
+.seed-container div {
+  font-size: 15px;
+  font-weight: 600;
+  color: #5c3200;
+  margin-bottom: 4px;
+}
+
+
+/* Sliders */
 input[type=range] {
   -webkit-appearance: none;
-  width: 200px;
-  height: 12px;
-  background: #b97a56;
-  border-radius: 8px;
+  width: 100%;
+  height: 14px;
+  background: #c19167;
+  border-radius: 10px;
   border: 2px solid #7c4a03;
-  box-shadow: 0 2px 8px #7c4a0333 inset;
-  margin-top: 10px;
+  box-shadow: inset 0 2px 6px #7c4a0333;
 }
 
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  appearance: none;
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #deb887;
+  background: linear-gradient(#ffe0b3, #deb887);
   border: 2px solid #7c4a03;
-  box-shadow: 0 2px 6px #7c4a03 inset, 0 0 0 4px #b97a56;
+  box-shadow: 0 0 0 4px #b97a56, inset 0 2px 6px #7c4a03;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-input[type=range]:focus {
-  outline: none;
-}
-
-input[type=range]::-moz-range-thumb {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #deb887;
-  border: 2px solid #7c4a03;
-  box-shadow: 0 2px 6px #7c4a03 inset, 0 0 0 4px #b97a56;
-  cursor: pointer;
-}
-
+/* Firefox + Edge thumbs */
+input[type=range]::-moz-range-thumb,
 input[type=range]::-ms-thumb {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #deb887;
+  background: linear-gradient(#ffe0b3, #deb887);
   border: 2px solid #7c4a03;
-  box-shadow: 0 2px 6px #7c4a03 inset, 0 0 0 4px #b97a56;
+  box-shadow: 0 0 0 4px #b97a56, inset 0 2px 6px #7c4a03;
   cursor: pointer;
 }
 
-input[type=range]::-moz-range-track {
-  background: #b97a56;
-  border-radius: 8px;
-  height: 12px;
-  border: 2px solid #7c4a03;
+
+/* Text input */
+.seed-container input[type="text"] {
+  padding: 12px;
+  font-size: 15px;
+  border: 2px solid #deb887;
+  border-radius: 10px;
+  background-color: #fffdf9;
+  color: #333;
+  transition: border 0.2s ease;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-input[type=range]::-ms-fill-lower,
-input[type=range]::-ms-fill-upper {
-  background: #b97a56;
-  border-radius: 8px;
-  border: 2px solid #7c4a03;
+.seed-container input:focus {
+  border-color: #c47200;
+  box-shadow: 0 0 6px rgba(124, 74, 3, 0.2);
+  outline: none;
 }
 
+/* Buttons (seed + spawn) */
+.spawn-button {
+  background: linear-gradient(to top, #deb887, #f6dcb8);
+  color: #5a2d00;
+  margin-left: 55px;
+  border: 2px solid #7c4a03;
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+.seed-regen-button {
+  background: linear-gradient(to top, #deb887, #f6dcb8);
+  color: #5a2d00;
+  border: 2px solid #7c4a03;
+  
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+
+}
+
+
+.seed-regen-button:hover,
+.spawn-button:hover {
+  background: linear-gradient(to top, #eecfa4, #fff0dc);
+  transform: translateY(-2px);
+}
+
+.seed-regen-button:active,
+.spawn-button:active {
+  background: #e1be91;
+  transform: scale(0.98);
+}
+
+
+.control-panel input[type="text"] {
+  padding: 12px 14px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 500;
+  border: 2px solid #deb887;
+  border-radius: 10px;
+  background: linear-gradient(to bottom, #fffdf9, #f7eee6);
+  color: #5c3200;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.control-panel input[type="text"]::placeholder {
+  color: #b97a56;
+  opacity: 0.8;
+}
+
+.control-panel input[type="text"]:focus {
+  border-color: #c47200;
+  background: #fff9ef;
+  box-shadow: 0 0 6px rgba(195, 114, 0, 0.25), inset 0 2px 6px rgba(0, 0, 0, 0.04);
+  outline: none;
+}
+
+.tick-label,
+.salinity-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #5c3200;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.seed-label {
+  font-size: 20px;
+  font-weight: 600;
+  color: #5c3200;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.almanac-btn {
+  width: 200px;
+  height: 200px;
+  cursor: pointer;
+  transition: filter 0.25s ease;
+  filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.3));
+  animation: pulse 3s infinite ease-in-out;
+}
+
+.almanac-btn:hover {
+  animation: pulse-hover 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.07);
+  }
+}
+
+@keyframes pulse-hover {
+  0%, 100% {
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+}

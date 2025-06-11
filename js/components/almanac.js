@@ -12,9 +12,9 @@ class Almanac {
         this.entryHeight = 180;
         this.lastPageChange = 0; // Timestamp of last page change
         this.pageChangeCooldown = 300; // 300ms cooldown between page changes
-        this.buttonX = 20;
-        this.buttonY = 400;
-        this.buttonBaseSize = 400;
+        this.buttonX = 1250;
+        this.buttonY = 500;
+        this.buttonBaseSize = 200;
         this.buttonHoverSize = 450;
         this.buttonCurrentSize = this.buttonBaseSize;
     }
@@ -24,6 +24,10 @@ class Almanac {
   
     setup() {
     this.button = createImg('assets/fishalmanac.png', 'Open Almanac');
+    this.button.addClass('almanac-btn');      
+this.button.position(this.buttonX, this.buttonY);
+this.button.size(200, 200);              
+this.button.mousePressed(() => this.toggle());
     this.button.position(this.buttonX, this.buttonY);
     this.button.size(this.buttonBaseSize, this.buttonBaseSize);
     this.button.mousePressed(() => this.toggle());
@@ -37,29 +41,7 @@ class Almanac {
         this.lastPageChange = millis(); // Reset cooldown when opening
     }
    update() {
-    let targetSize = this.buttonBaseSize;
-    let overButton = false;
-
-    // Check if mouse is over the button based on current size
-    let centerX = this.buttonX + this.buttonBaseSize / 2;
-    let centerY = this.buttonY + this.buttonBaseSize / 2;
-    let halfSize = this.buttonCurrentSize / 2;
-
-    if (mouseX >= centerX - halfSize && mouseX <= centerX + halfSize &&
-        mouseY >= centerY - halfSize && mouseY <= centerY + halfSize) {
-        targetSize = this.buttonHoverSize;
-        overButton = true;
-    }
-
-    // Smooth growth
-    this.buttonCurrentSize = lerp(this.buttonCurrentSize, targetSize, 0.1);
-
-    // Update size and reposition so it stays centered
-    let newX = centerX - this.buttonCurrentSize / 2;
-    let newY = centerY - this.buttonCurrentSize / 2;
-
-    this.button.size(this.buttonCurrentSize, this.buttonCurrentSize);
-    this.button.position(newX, newY);
+    
 }
 
     display() {
@@ -127,7 +109,12 @@ class Almanac {
         fill(50);
         textSize(this.titleFontSize);
         textAlign(LEFT, TOP);
-        text(`Fish #${fishArray.indexOf(fish) + 1}`, x - this.entryWidth/2 + this.padding, y - this.entryHeight/2 + this.padding);
+        textFont('Segoe UI', this.titleFontSize);
+        textStyle(BOLD);
+        text(fish.name, x - this.entryWidth/2 + this.padding,
+            y - this.entryHeight/2 + this.padding);
+        textStyle(NORMAL);
+
         
         // Fish sprite
         push();

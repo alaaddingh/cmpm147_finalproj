@@ -217,105 +217,119 @@ async function setupnames() {
   console.log("Fish names loaded:", fishnames);
 
 }
+
 async function setup() {
   background(100);
 
-  let cnvScale = 0.8;
-  let cWidth = windowWidth * cnvScale;
-  let cHeight = windowHeight * cnvScale;
+  // ---------- canvas ----------
+  const cnvScale = 0.8;
+  const cWidth   = windowWidth  * cnvScale;
+  const cHeight  = windowHeight * cnvScale;
+  const xPos     = (windowWidth  - cWidth)  / 2 - 20; // shift right to make room for UI
+  const yPos     = 80;
 
-  let xPos = (windowWidth - cWidth) / 2;
-  let yPos = 80; 
-
-  // Initialize seeded random
   seededRandom = seededRandomGenerator(seed);
 
   cnv = createCanvas(cWidth, cHeight);
   cnv.position(xPos, yPos);
   imageMode(CENTER);
-  fishNamesData = await loadJSONAsync('./assets/fishnames.json');
-  fishnames = fishNamesData.names;
-  console.log("Fish names loaded:", fishnames);
 
-  // THEN load fish using the now-loaded fishnames
+  fishNamesData = await loadJSONAsync('./assets/fishnames.json');
+  fishnames     = fishNamesData.names;
   loadfish();
   setupnames();
-
-
   generateRandomFish(10, true);
-  console.log(fishArray);
   generateInitialPlankton(initialPlanktonCount);
   setupFeeder();
 
-  // Place the slider at a fixed position (e.g., top left)
-  tickSlider = createSlider(0.1, 3, 1, 0.01);
-  tickSlider.position(15, 200);
-  tickSlider.style('width', '200px');
-
-  // Create the label and position it next to the slider
-  tickLabel = createDiv('Speed: ' + tickSpeed.toFixed(2) + 'x');
-  tickLabel.position(200, 100); 
-  tickLabel.style('color', '#000');
-  tickLabel.style('font-size', '16px');
-  tickLabel.style('font-family', 'sans-serif');
-  tickLabel.style('user-select', 'none');
-  tickLabel.style('text-shadow', '1px 1px 2px #000');
-
-  salinitySlider = createSlider(0, 100, 50, 1);
-  salinitySlider.position(15, tickSlider.y + 60);
-  salinitySlider.style('width', '200px');
-
-  salinityLabel = createDiv('Salinity: ' + salinityLevel + '%');
-  salinityLabel.position(salinitySlider.x, salinitySlider.y + salinitySlider.height + 5);
-  salinityLabel.style('color', '#000');
-  salinityLabel.style('font-size', '16px');
-  salinityLabel.style('font-family', 'sans-serif');
-  salinityLabel.style('user-select', 'none');
-  salinityLabel.style('text-shadow', '1px 1px 2px #000');
-
-  //side panekl setup
-  let panelWidth = 200; // or any width you want!
-  sidePanel = new SidePanel(width -panelWidth/2, 0, panelWidth, height);
 
 
-  //spawn button to spawn random fish from JSON
-  let spawnButton = createButton('Spawn Random Fish');
-  spawnButton.position(salinitySlider.x, salinityLabel.y + 40);
-  spawnButton.mousePressed(spawnRandomFishFromJSON);
-  spawnButton.style('font-size', '14px');
-  spawnButton.style('padding', '6px 12px');
-  spawnButton.style('background-color', '#55aaff');
-  spawnButton.style('color', 'white');
-  spawnButton.style('border', 'none');
-  spawnButton.style('border-radius', '5px');
-  spawnButton.style('cursor', 'pointer');
+let container = createDiv(); // Outer container
+container.class('side-panel-container');
+container.parent(document.body); // important
 
-  let seedInput = createInput(seed);
-  seedInput.position(15, 150);
-  seedInput.style('width', '200px');
-  seedInput.input(() => {
-    seed = seedInput.value();
-  });
-  
-  let seedLabel = createDiv('Seed:');
-  seedLabel.position(15, 130);
-  seedLabel.style('color', '#000');
-  seedLabel.style('font-size', '16px');
-  
-  // Add regenerate button
-  let regenButton = createButton('Regenerate with Seed');
-  regenButton.position(15, 180);
+let wrapper = createDiv();
+wrapper.addClass('panel-wrapper');
+wrapper.parent(container);
+
+let toggle = createButton('');
+toggle.addClass('panel-toggle');
+wrapper.addClass('collapsed');
+toggle.parent(container); // sibling of wrapper
+
+toggle.mousePressed(() => {
+  wrapper.toggleClass('collapsed');
+  wrapper.toggleClass('expanded');
+  const isCollapsed = wrapper.hasClass('collapsed');
+  toggle.html(isCollapsed ? ' ' : '☰');
+});
+
+
+// Create control panel inside wrapper
+const controlPanel = createDiv();
+controlPanel.class('control-panel');
+controlPanel.parent(wrapper);
+
+
+
+  // Seed label + input + regen button
+  const seedLabel = createDiv('Seed');
+  seedLabel.parent(controlPanel);
+  seedLabel.class('seed-label');
+
+
+  const seedInput = createInput(seed);
+  seedInput.parent(controlPanel);
+  seedInput.input(() => seed = seedInput.value());
+
+  const regenButton = createButton('Regenerate with Seed');
+  regenButton.parent(controlPanel);
+  regenButton.class('seed-regen-button');
   regenButton.mousePressed(() => {
-    fishArray = [];
-    planktonArray = [];
-    seededRandom = seededRandomGenerator(seed);
+    fishArray      = [];
+    planktonArray  = [];
+    seededRandom   = seededRandomGenerator(seed);
     generateRandomFish(10, true);
     generateInitialPlankton(initialPlanktonCount, true);
   });
 
+  // Speed slider + label
+  tickLabel  = createDiv('Speed: ' + tickSpeed.toFixed(2) + 'x');
+  tickLabel.parent(controlPanel);
+  tickLabel.class('tick-label');
+
+  tickSlider = createSlider(0.1, 3, 1, 0.01);
+  tickSlider.parent(controlPanel);
+
+  // Salinity slider + label
+  salinityLabel = createDiv('Salinity: ' + salinityLevel + '%');
+  salinityLabel.parent(controlPanel);
+  salinityLabel.class('salinity-label');
+
+  salinitySlider = createSlider(0, 100, 50, 1);
+  salinitySlider.parent(controlPanel);
+
+  // Spawn button
+const spawnButtonDiv = createDiv(); 
+spawnButtonDiv.parent(controlPanel);
+const spawnButton = createButton('Spawn Random Fish');
+spawnButton.class('spawn-button'); 
+spawnButton.parent(spawnButtonDiv);
+spawnButton.mousePressed(spawnRandomFishFromJSON);
+
+
+
+  
+
+  // ---------- RIGHT-HAND FISH STATS PANEL ----------
+  let panelWidth = 250;
+  sidePanel = new SidePanel(width - panelWidth + 100, 10, panelWidth + 50, height - 300);
+
+  // ---------- Almanac ----------
   almanac = new Almanac();
   almanac.setup();
 }
+
 
 function draw() {
   // Pause the game if the almanac is visible
@@ -341,17 +355,14 @@ function draw() {
 
   // Update the label text and keep it below the slider
   tickLabel.html('Speed: ' + tickSpeed.toFixed(2) + 'x');
-  tickLabel.position(tickSlider.x, tickSlider.y + tickSlider.height + 20);
-
   salinityLabel.html('Salinity: ' + salinityLevel + '%');
-  salinityLabel.position(salinitySlider.x, salinitySlider.y + salinitySlider.height + 5);
+
 
     drawFeeder();
     updateAndDrawFood();
 
     
   sidePanel.display(selectedFish);
-
   almanac.display();
   almanac.update();
 }
@@ -500,4 +511,5 @@ function mouseReleased() {
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   sidePanel = new SidePanel(width - panelWidth, 0, panelWidth, height);
+
 }
