@@ -12,7 +12,7 @@ class Almanac {
         this.entryHeight = 180;
         this.lastPageChange = 0; // Timestamp of last page change
         this.pageChangeCooldown = 300; // 300ms cooldown between page changes
-        this.buttonX = 1450;
+        this.buttonX = 100;
         this.buttonY = 500;
         this.buttonBaseSize = 200;
         this.buttonHoverSize = 450;
