@@ -6,7 +6,9 @@ class Fish {
     this.baseY = y; // used for tickspeed
     this.maxEnergy = traits.lifespan; // How long without eating before death
     this.invincibleTimer = 5; // seconds of invincibility after spawning
-    this.speed = traits.speed;
+    this.traitSpeed    = traits.speed;    // baseline speed used for inheritance
+    this.speed         = this.traitSpeed; // current, will be reset/boosted at runtime
+    this.originalSpeed = this.traitSpeed; 
     this.finSize = traits.finSize;
     this.size = traits.size;
     this.color = traits.color;
@@ -39,10 +41,8 @@ class Fish {
   // Variables for state machine
   // and fish behavior
 
-  this.originalSpeed = this.speed;
   this.heading = random(0, TWO_PI);
   this.heading = random(0, TWO_PI);
-  this.originalSpeed = this.speed; 
   this.decisionCooldown = 700; 
   this.lastDecisionTime = millis(); 
   this.state        = "wander";          // wander, hunt, flee
@@ -343,7 +343,7 @@ function steerTowardAngle(targetAngle, boost = 1) {
       // Genetic recombination with mutation
       let rand = seededRandom; // Use seeded random for consistency
       let newTraits = {
-        speed: (this.speed + other.speed) / 2 * (0.9 + 0.2 * rand()),
+        speed: ((this.traitSpeed + other.traitSpeed) / 2) * (0.9 + 0.2 * rand()),
         size: (this.size + other.size) / 2 * (0.9 + 0.2 * rand()),
         finSize: (this.finSize + other.finSize) / 2 * (0.9 + 0.2 * rand()),
         color: lerpColor(color(this.color), color(other.color), 0.3 + 0.4 * rand()),
