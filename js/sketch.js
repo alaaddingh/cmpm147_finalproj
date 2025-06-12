@@ -17,6 +17,7 @@ let sidePanel; //sidepanel stuff
 let salinitySlider;//slider for salinity
 let salinityLevel = 50; // default 50% saltwater
 let salinityLabel;
+let cloneFishBtn = null;
 
 
 // async call to load json data for fish names
@@ -329,7 +330,25 @@ spawnButton.mousePressed(spawnRandomFishFromJSON);
   almanac = new Almanac();
   almanac.setup();
 }
-
+//nclonign button on side pame;
+function cloneSelectedFish(fish) {
+  let cloneTraits = {
+    name: fish.name + " (Clone)",
+    speed: fish.speed,
+    finSize: fish.finSize,
+    size: fish.size,
+    color: fish.color,
+    aggression: fish.aggression,
+    lifespan: fish.lifespan,
+    health: fish.health,
+    salinityPreference: fish.salinityPreference,
+    salinityTolerance: fish.salinityTolerance,
+    diet: fish.diet
+  };
+  let x = fish.x + 30;
+  let y = fish.y + 30;
+  fishArray.push(new Fish(x, y, cloneTraits));
+}
 
 function draw() {
   // Pause the game if the almanac is visible
@@ -365,6 +384,31 @@ function draw() {
   sidePanel.display(selectedFish);
   almanac.display();
   almanac.update();
+
+  // Show/hide Clone Fish button:
+  if (selectedFish && !cloneFishBtn) {
+    cloneFishBtn = createButton('Clone Fish');
+    cloneFishBtn.mousePressed(() => {
+      cloneSelectedFish(selectedFish);
+    });
+    cloneFishBtn.elt.addEventListener('mousedown', (e) => {
+      e.stopPropagation();
+    });
+    cloneFishBtn.position(width - 190, 90); // Adjust X/Y as needed!
+    cloneFishBtn.size(120, 34);
+    cloneFishBtn.style('font-size', '15px');
+    cloneFishBtn.style('background', '#50ba77');
+    cloneFishBtn.style('color', '#fff');
+    cloneFishBtn.style('border', 'none');
+    cloneFishBtn.style('border-radius', '8px');
+    cloneFishBtn.style('cursor', 'pointer');
+    cloneFishBtn.mousePressed(() => {
+      cloneSelectedFish(selectedFish);
+    });
+  } else if (!selectedFish && cloneFishBtn) {
+    cloneFishBtn.remove();
+    cloneFishBtn = null;
+  }
 }
 
 function showFishName() {//rounded the stats so it doesn't look too cluttered
@@ -491,7 +535,7 @@ function mousePressed() {
   for (let fish of fishArray) {
     if (dist(mouseX, mouseY, fish.x, fish.y) < fish.size / 2) {
       selectedFish = fish;
-      break;
+      return;
     }
   }
   saveFishStats();
