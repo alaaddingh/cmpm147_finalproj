@@ -2,7 +2,9 @@ let img;
 let cnv;
 let initialPlanktonCount = 100;
 let planktoncount = initialPlanktonCount; 
-let planktonCooldown = 35;
+// let planktonCooldown = 40;
+let planktonRateSlider;// for plankton generation rate
+let planktonRateLabel;
 let planktonTimer = 0;
 let fishData;
 let fishArray = [];
@@ -310,6 +312,23 @@ controlPanel.parent(wrapper);
   salinitySlider = createSlider(0, 100, 50, 1);
   salinitySlider.parent(controlPanel);
 
+
+  const planktonStaticLabel = createDiv('Plankton Rate');
+  planktonStaticLabel.parent(controlPanel);
+  planktonStaticLabel.class('salinity-label');
+  
+
+  planktonRateSlider = createSlider(0, 100, 50);
+  planktonRateSlider.parent(controlPanel);
+  planktonRateSlider.style('width', '100%');
+  planktonRateSlider.class('control-slider');
+
+  // Plankton value label (this will update in draw)
+  planktonRateLabel = createDiv('Rate: 50% (cooldown 40 ms)');
+  planktonRateLabel.parent(controlPanel);
+  planktonRateLabel.class('salinity-label');
+
+
   // Spawn button
 const spawnButtonDiv = createDiv(); 
 spawnButtonDiv.parent(controlPanel);
@@ -360,6 +379,14 @@ function draw() {
   salinityLevel = salinitySlider.value();
   tankbackground();
 
+  let ratePct = planktonRateSlider.value();
+  planktonCooldown = map(ratePct, 0, 100, 200, 10);
+
+  planktonRateLabel.html(
+    `Rate: ${nf(ratePct, 1)}%  (cooldown ${planktonCooldown.toFixed(0)} ms)`
+  );
+
+  
   updateAndDrawFish();
   updateAndDrawPlankton();
   showFishName();
