@@ -1,3 +1,4 @@
+//sidepanel.js
 class SidePanel {
   constructor(x, y, w, h) {
     this.x = x;

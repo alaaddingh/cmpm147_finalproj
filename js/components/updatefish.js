@@ -1,3 +1,4 @@
+//updatefish.js
 function updateAndDrawFish() {
   // Temporary array for this frame's new fish
   let newFish = []; 

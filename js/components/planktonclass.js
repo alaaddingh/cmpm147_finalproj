@@ -1,3 +1,4 @@
+//planktonclass.js
 class Plankton {
 
     constructor(x, y, properties = {}, rand = Math.random) {

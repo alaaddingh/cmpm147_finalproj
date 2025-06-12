@@ -20,7 +20,9 @@ let salinitySlider;//slider for salinity
 let salinityLevel = 50; // default 50% saltwater
 let salinityLabel;
 let cloneFishBtn = null;
-
+let customFishPanel = null;
+let customFishInputs = {};
+let customFishHistory = [];
 
 // async call to load json data for fish names
 function loadJSONAsync(path) {
@@ -296,6 +298,14 @@ controlPanel.parent(wrapper);
     generateInitialPlankton(initialPlanktonCount, true);
   });
 
+  //custom fish builder
+  customFishBtn = createButton('Custom Fish Creator');
+  customFishBtn.parent(controlPanel);
+  customFishBtn.class('spawn-button');
+  customFishBtn.style('margin-top', '10px');
+  customFishBtn.mousePressed(showCustomFishPanel);
+
+
   // Speed slider + label
   tickLabel  = createDiv('Speed: ' + tickSpeed.toFixed(2) + 'x');
   tickLabel.parent(controlPanel);
@@ -368,6 +378,157 @@ function cloneSelectedFish(fish) {
   let y = fish.y + 30;
   fishArray.push(new Fish(x, y, cloneTraits));
 }
+
+
+
+
+
+function showCustomFishPanel(traits) {
+  if (customFishPanel) customFishPanel.remove();
+  customFishInputs = {};
+
+  customFishPanel = createDiv();
+  customFishPanel.class('custom-fish-panel');
+  customFishPanel.position(windowWidth / 2 - 210, windowHeight / 2 - 480);
+  customFishPanel.style('width', '480px');
+  customFishPanel.style('height', '960px');
+  customFishPanel.style('background', '#fff8f0'); // matches your .control-panel
+  customFishPanel.style('border', '2px solid #deb887');
+  customFishPanel.style('border-radius', '16px');
+  customFishPanel.style('padding', '28px 24px 14px 24px');
+  customFishPanel.style('box-shadow', '0 0 28px #b97a5677');
+  customFishPanel.style('z-index', '10001');
+  customFishPanel.style('position', 'fixed');
+  customFishPanel.style('display', 'flex');
+  customFishPanel.style('flex-direction', 'column');
+  customFishPanel.style('gap', '8px');
+
+  // Close button
+  let closeBtn = createButton('×');
+  closeBtn.parent(customFishPanel);
+  closeBtn.style('position', 'absolute');
+  closeBtn.style('right', '18px');
+  closeBtn.style('top', '8px');
+  closeBtn.style('background', 'none');
+  closeBtn.style('border', 'none');
+  closeBtn.style('font-size', '28px');
+  closeBtn.style('color', '#b97a56');
+  closeBtn.style('cursor', 'pointer');
+  closeBtn.mousePressed(() => customFishPanel.remove());
+
+  // Title
+  let title = createElement('h2', 'Custom Fish Creator');
+  title.parent(customFishPanel);
+  title.style('margin', '0 0 10px 0');
+  title.style('text-align', 'center');
+  title.style('color', '#5c3200');
+
+  // Defaults or reload
+  let t = traits || {
+    name: 'MyFish',
+    speed: 2,
+    finSize: 15,
+    size: 30,
+    color: '#33aaff',
+    aggression: 0.4,
+    lifespan: 140,
+    health: 100,
+    salinityPreference: 50,
+    salinityTolerance: 20,
+    diet: 'herbivore'
+  };
+
+  // Build inputs for each trait
+  let fields = [
+    ['Name:', 'name', createInput(t.name)],
+    ['Speed:', 'speed', createSlider(0.5, 3.5, t.speed, 0.05)],
+    ['Fin Size:', 'finSize', createSlider(5, 30, t.finSize, 1)],
+    ['Body Size:', 'size', createSlider(15, 60, t.size, 1)],
+    ['Color:', 'color', createInput(t.color, 'color')],
+    ['Aggression:', 'aggression', createSlider(0, 1, t.aggression, 0.01)],
+    ['Lifespan:', 'lifespan', createSlider(80, 300, t.lifespan, 1)],
+    ['Health:', 'health', createSlider(10, 200, t.health, 1)],
+    ['Salinity Pref.:', 'salinityPreference', createSlider(0, 100, t.salinityPreference, 1)],
+    ['Salinity Tol.:', 'salinityTolerance', createSlider(5, 50, t.salinityTolerance, 1)],
+    ['Diet:', 'diet', (() => {
+      let sel = createSelect();
+      sel.option('herbivore');
+      sel.option('carnivore');
+      sel.value(t.diet);
+      return sel;
+    })()]
+  ];
+
+  for (let [label, key, input] of fields) {
+    let div = createDiv(label);
+    div.parent(customFishPanel);
+    div.style('font-size', '16px');
+    div.style('font-weight', '600');
+    div.style('color', '#5c3200');
+    input.parent(customFishPanel);
+    input.style('margin-bottom', '8px');
+    customFishInputs[key] = input;
+  }
+
+  // Create button
+  let confirmBtn = createButton('Create Fish');
+  confirmBtn.parent(customFishPanel);
+  confirmBtn.class('spawn-button');
+  confirmBtn.style('margin-top', '16px');
+  confirmBtn.mousePressed(() => {
+    createCustomFish();
+  });
+
+  // History buttons 
+  if (customFishHistory.length > 0) {
+    let historyTitle = createDiv('Last 5 Custom Fishes:').parent(customFishPanel);
+    historyTitle.style('margin', '18px 0 6px 0');
+    historyTitle.style('font-size', '15px');
+    historyTitle.style('font-weight', '600');
+    historyTitle.style('color', '#5c3200');
+    let historyDiv = createDiv().parent(customFishPanel);
+    for (let i = 0; i < customFishHistory.length; i++) {
+      let quickBtn = createButton(customFishHistory[i].name || 'Custom Fish');
+      quickBtn.parent(historyDiv);
+      quickBtn.style('margin', '2px 5px 2px 0');
+      quickBtn.style('background', '#eecfa4');
+      quickBtn.style('color', '#7c4a03');
+      quickBtn.style('font-size', '14px');
+      quickBtn.style('border-radius', '6px');
+      quickBtn.mousePressed(() => {
+        showCustomFishPanel(customFishHistory[i]);
+      });
+    }
+  }
+}
+
+function createCustomFish() {
+  let traits = {
+    name: customFishInputs.name.value(),
+    speed: Number(customFishInputs.speed.value()),
+    finSize: Number(customFishInputs.finSize.value()),
+    size: Number(customFishInputs.size.value()),
+    color: color(customFishInputs.color.value()),
+    aggression: Number(customFishInputs.aggression.value()),
+    lifespan: Number(customFishInputs.lifespan.value()),
+    health: Number(customFishInputs.health.value()),
+    salinityPreference: Number(customFishInputs.salinityPreference.value()),
+    salinityTolerance: Number(customFishInputs.salinityTolerance.value()),
+    diet: customFishInputs.diet.value()
+  };
+  let x = random(TANK.left() + traits.size / 2, TANK.right() - traits.size / 2);
+  let y = random(TANK.top() + traits.size / 2, TANK.bottom() - traits.size / 2);
+  fishArray.push(new Fish(x, y, traits));
+
+  // Save last few fish to history
+  let toSave = Object.assign({}, traits);
+  toSave.color = customFishInputs.color.value(); // HEX for reloading
+  customFishHistory.unshift(toSave);
+  if (customFishHistory.length > 5) customFishHistory.pop();
+
+  if (customFishPanel) customFishPanel.remove();
+}
+
 
 function draw() {
   // Pause the game if the almanac is visible

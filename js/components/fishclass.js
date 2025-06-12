@@ -1,3 +1,4 @@
+//fishclas.js
 class Fish {
   constructor(x, y, traits = {}, rand = Math.random) {
     this.x = x;
