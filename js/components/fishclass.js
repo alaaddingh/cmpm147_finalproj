@@ -38,15 +38,20 @@ class Fish {
 
   // Variables for state machine
   // and fish behavior
+
+  this.originalSpeed = this.speed;
+  this.heading = random(0, TWO_PI);
+  this.heading = random(0, TWO_PI);
   this.originalSpeed = this.speed; 
   this.decisionCooldown = 700; 
   this.lastDecisionTime = millis(); 
   this.state        = "wander";          // wander, hunt, flee
   this.stateTimer   = 10;                
   this.target       = null;              // current fish or plankton we’re focussed on
-  this.visionRange  = 500;               
-  this.visionAngle  = PI / 2;            
-  this.maxStateDur  = { hunt: 3500, flee: 4000 };
+  this.visionRange  = 100;
+               
+  this.visionAngle  = PI * 0.65; // 65 degrees field of view
+  this.maxStateDur  = { hunt: 4500, flee: 1000 };
 
   
   
@@ -153,7 +158,8 @@ class Fish {
     const dist    = toObj.mag();
     if (dist > this.visionRange || dist === 0) return false;
     const angle   = acos(p5.Vector.dot(fwd, toObj.copy().normalize()));
-    return angle < this.visionAngle * 0.6;   // half-angle on either side
+    // return angle < this.visionAngle * 0.6;   // half-angle on either side
+    return angle < this.visionAngle; 
   };
 
   let closestPlankton   = null, dPlankton   = Infinity;
@@ -186,57 +192,78 @@ class Fish {
  */
 
 decideAndAct(env) {
+  // helper to steer toward (or away, by inverting target coords)
+  const MAX_TURN = PI / 10;
+
+function steerTowardAngle(targetAngle, boost = 1) {
+  let diff = (targetAngle - this.heading + PI) % (TWO_PI) - PI;
+  diff = constrain(diff, -MAX_TURN, MAX_TURN);
+  this.heading = this.heading + diff;
+  this.speed   = this.originalSpeed * boost;
+  this.updateVelocityFromHeading();
+}
+
+  // ==== DECISION PHASE (only from wander) ====
   if (this.state === "wander") {
+    // allow speed reset
     this.speed = this.originalSpeed;
-    if (this.diet === "herbivore" && env.closestPlankton) {
-      this.state    = "hunt";
-      this.target   = env.closestPlankton;
-      this.stateTimer = this.maxStateDur.hunt;
-    } else if (this.diet === "herbivore" && env.closestCarnivore) {
-      this.state    = "flee";
-      this.target   = env.closestCarnivore;
-      this.speed *= 1.5;
+
+    // if a carnivore is spotted first → flee
+    if (this.diet === "herbivore" && env.closestCarnivore) {
+      this.state      = "flee";
+      this.target     = env.closestCarnivore;
+      // this.speed     *= 1.5;
       this.stateTimer = this.maxStateDur.flee;
+
+    // else if plankton is spotted → hunt
+    } else if (this.diet === "herbivore" && env.closestPlankton) {
+      //console.log(`${this.name} entering HUNT (plankton at ${nf(dist(this.x,this.y, env.closestPlankton.x, env.closestPlankton.y),1,1)}px)`); 
+      this.state      = "hunt";
+      this.target     = env.closestPlankton;
+      this.stateTimer = this.maxStateDur.hunt;
+
+    // carnivores hunt herbivores
     } else if (this.diet === "carnivore" && env.closestHerbivore) {
-      this.state    = "hunt";
-      this.speed *= 1.1; 
-      this.target   = env.closestHerbivore;
+      this.state      = "hunt";
+      this.target     = env.closestHerbivore;
+      // this.speed     *= 1.2;
       this.stateTimer = this.maxStateDur.hunt;
     }
   }
 
-  const steerToward = (tx, ty, boost = 1) => {
-    const a = atan2(ty - this.y, tx - this.x);
-    this.vx = cos(a) * this.speed * boost;
-    this.vy = sin(a) * this.speed * 0.4 * boost;  
-  };
-
+  // ==== ACTION PHASE (steer & countdown) ====
   switch (this.state) {
     case "hunt":
-      if (!this.target || !this.target.alive || this.stateTimer <= 0) {
+      if (this.target && this.target.alive) {
+        let targetAngle = atan2(this.target.y - this.y, this.target.x - this.x);
+        steerTowardAngle.call(this, targetAngle, 1);
+      }
+      this.stateTimer -= deltaTime;
+      if (this.stateTimer <= 0 || !this.target?.alive) {
         this.state = "wander";
         this.target = null;
-      } else {
-        steerToward(this.target.x, this.target.y, 1.3);
-        this.stateTimer -= deltaTime;
       }
       break;
 
     case "flee":
-      if (!this.target || !this.target.alive || this.stateTimer <= 0) {
+      if (this.target && this.target.alive) {
+        let awayAngle = atan2( this.y - this.target.y,
+                              this.x - this.target.x );
+        steerTowardAngle.call(this, awayAngle, 1.2);
+      }
+      this.stateTimer -= deltaTime;
+      if (this.stateTimer <= 0) {
         this.state = "wander";
         this.target = null;
-      } else {
-        steerToward(
-          this.x - (this.target.x - this.x),
-          this.y - (this.target.y - this.y),
-          1.2
-        );
-        this.stateTimer -= deltaTime;
       }
       break;
 
-    default: 
+    case "wander":
+      const jitter = random(-MAX_TURN/2, MAX_TURN/2);
+      this.heading += jitter;
+      this.updateVelocityFromHeading();
+
+    default:
       break;
   }
 }
@@ -244,6 +271,12 @@ decideAndAct(env) {
   /**
    *  Checks if this fish can eat the other fish
    */
+
+  updateVelocityFromHeading() {
+    this.vx = cos(this.heading) * this.speed;
+    this.vy = sin(this.heading) * this.speed * 0.4;
+  }
+
   eatFish(other) {
     if (this === other || !other.alive || this.attackCooldown > 0) return false;
     
@@ -264,12 +297,12 @@ decideAndAct(env) {
     other.health -= finalDamage;
     this.lastEatTime = now; // Reset cooldown timer
 
-    console.log(`${this.diet} fish attacked ${other.diet}, dealing ${finalDamage.toFixed(1)} damage (HP left: ${other.health.toFixed(1)})`);
+    // console.log(`${this.diet} fish attacked ${other.diet}, dealing ${finalDamage.toFixed(1)} damage (HP left: ${other.health.toFixed(1)})`);
 
     if (other.health <= 0) {
       other.alive = false;
       this.energy += other.size * 5; // Reward only on kill
-      console.log(`${this.diet} fish killed and ate ${other.diet}`);
+      // console.log(`${this.diet} fish killed and ate ${other.diet}`);
       return true;
     }
 
@@ -283,8 +316,8 @@ decideAndAct(env) {
       // Current time in milliseconds
       let now = millis();
       
-      // Breeding cooldown (3 seconds)
-      let breedCooldown = 3000;
+      // Breeding cooldown (2 seconds)
+      let breedCooldown = 2000;
       
       // Check all breeding conditions
       if (
