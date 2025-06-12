@@ -1,8 +1,8 @@
 let img;
 let cnv;
-let initialPlanktonCount = 100;
+let initialPlanktonCount = 200;
 let planktoncount = initialPlanktonCount; 
-let planktonCooldown = 100;
+let planktonCooldown = 20;
 let planktonTimer = 0;
 let fishData;
 let fishArray = [];

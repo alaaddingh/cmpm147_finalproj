@@ -1,4 +1,4 @@
-let energyMult = 5;
+let energyMult = 8;
 function updateAndDrawPlankton() {
     for (let i = planktonArray.length - 1; i >= 0; i--) {
         let plankton = planktonArray[i];

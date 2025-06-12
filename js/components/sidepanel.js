@@ -34,6 +34,8 @@ class SidePanel {
         ['Name',        fish.name],
         ['State',       fish.state],
         ['Energy',      fish.energy.toFixed(1)],
+        ['Health',      fish.health.toFixed(1)],
+        ['Size',        fish.size.toFixed(2)],
         ['Age',         fish.age.toFixed(0)],
         ['Speed',       fish.speed.toFixed(2)],
         ['Size',        fish.size.toFixed(2)],
